@@ -1,0 +1,9 @@
+[debug] Copy resource mappings: 
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text/transform,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text/transform)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text/transform/format,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text/transform/format)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text/transform/format/latex,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text/transform/format/latex)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text/transform/format/latex/messages.properties,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text/transform/format/latex/messages.properties)
+[debug] 	(/Users/nidi/idea/text-transform-scala/src/main/resources/org/mimacom/text/transform/format/latex/messages_de.properties,/Users/nidi/idea/text-transform-scala/target/scala-2.10/classes/org/mimacom/text/transform/format/latex/messages_de.properties)
