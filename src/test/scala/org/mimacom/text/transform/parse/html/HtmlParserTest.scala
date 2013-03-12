@@ -112,6 +112,12 @@ class HtmlParserTest extends FlatSpec {
     assertSegmentEquals(PLAIN, "hey ", list, 0)
   }
 
+  behavior of "entities"
+
+  it should "ingore unkonwn entities silently" in {
+    val list = parse("xx&theta;yy")
+  }
+
   behavior of "<em>"
 
   it should "be parsed as italics" in {

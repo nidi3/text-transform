@@ -34,7 +34,7 @@ class AttributeValue private(name: String) extends Const(name)
  * and consumed by a {@link Formatter}.
  * A Segment is defined by its name, a map of attributes and a list of child segments.
  */
-class Segment private(val name: Name) extends PseudoSegment {
+class Segment(val name: Name) extends PseudoSegment {
   val attributes = Map[Attribute, Any]()
   val children = ListBuffer[Segment]()
   private var _parent: Option[Segment] = None
@@ -48,7 +48,7 @@ class Segment private(val name: Name) extends PseudoSegment {
     this
   }
 
-  def add(values: PseudoSegment*) = {
+  def add(values: PseudoSegment*): Segment = {
     values.foreach(_ match {
       case seg: Segment =>
         seg._parent = Some(this)
@@ -58,6 +58,9 @@ class Segment private(val name: Name) extends PseudoSegment {
     })
     this
   }
+
+  def add(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
+  def add(child: Segment): Segment = add(child)
 
   def root: Segment = {
     parent match {
