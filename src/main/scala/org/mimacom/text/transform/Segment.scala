@@ -37,7 +37,7 @@ class AttributeValue private(name: String) extends Const(name)
 class Segment private(val name: Name) extends PseudoSegment {
   val attributes = Map[Attribute, Any]()
   val children = ListBuffer[Segment]()
-  private var _parent: Segment = null
+  private var _parent: Option[Segment] = None
 
   def apply(name: Attribute): Option[Any] = attributes.get(name)
 
@@ -51,7 +51,7 @@ class Segment private(val name: Name) extends PseudoSegment {
   def add(values: PseudoSegment*) = {
     values.foreach(_ match {
       case seg: Segment =>
-        seg._parent = this
+        seg._parent = Some(this)
         children += seg
       case attr: AttributePair =>
         attributes.put(attr._1, attr._2)
@@ -59,16 +59,13 @@ class Segment private(val name: Name) extends PseudoSegment {
     this
   }
 
-  //
-  //
-  //  public Segment getRoot() {
-  //    Segment root = this;
-  //    while (root.getParent() != null) {
-  //      root = root.getParent();
-  //    }
-  //    return root;
-  //  }
-  //
+  def root: Segment = {
+    parent match {
+      case Some(seg) => seg.root
+      case None => this
+    }
+  }
+
   override def toString = {
     val s = new StringBuilder
     toFormattedString(s, 0)

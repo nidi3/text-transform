@@ -22,10 +22,11 @@ class ListState {
   }
 
   def gotoParent() {
-    currentList = currentList.parent
-    if (currentList != null && currentList.name != LIST) {
-      currentList = null
-    }
+    currentList =
+      currentList.parent match {
+        case Some(p) if (p.name == LIST) => p
+        case _ => null
+      }
   }
 
   def gotoChild(list: Segment) {
