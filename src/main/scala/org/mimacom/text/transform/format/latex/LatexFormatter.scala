@@ -41,6 +41,20 @@ private[latex] object LatexFormatter {
     }
   }
 
+  val definitionFormatter = (context: Context, segment: Segment) => {
+    def formatChildren(context: Context, segment: Segment): String = {
+      segment.children.map(child => format(context, child)).mkString("\\\\")
+    }
+
+    val width = segment(WIDTH) match {
+      case Some(s) => s
+      case _ => "5cm"
+    }
+    val item = segment(TEXT).get.asInstanceOf[String]
+    val text = formatChildren(context, segment)
+    s"\\begin{description}[leftmargin=$width,style=sameline]\\item[$item]$text\\end{description}"
+  }
+
   val headingFormatter = (context: Context, segment: Segment) => {
     val headings = List(
       "chapter", "section", "subsection", "subsubsection", "paragraph", "subparagraph"
@@ -61,20 +75,19 @@ private[latex] object LatexFormatter {
     IMAGE -> ImageFormatter.format _,
     TABLE -> TableFormatter.format _,
     LINE -> staticFormatter("\\\\ \\hline \\noindent \\\\") _,
+    NEWLINE -> staticFormatter("\\\\") _,
     LIST_ITEM -> cmdFormatter("item") _,
     ITALICS -> cmdFormatter("textit") _,
     BOLD -> cmdFormatter("textbf") _,
-    PLAIN -> PlainFormatter.format _
+    PLAIN -> PlainFormatter.format _,
+    DEFINITION -> definitionFormatter
   )
 
-  def format(context: Context, segment: Segment) =
+  def format(context: Context, segment: Segment): String =
     formatters.getOrElse(segment.name, defaultFormatter)(context, segment)
 
-  def formatChildren(context: Context, segment: Segment): String = {
-    val result = new StringBuilder
-    segment.children.foreach(child => result.append(format(context, child)))
-    result.toString
-  }
+  def formatChildren(context: Context, segment: Segment): String =
+    segment.children.map(child => format(context, child)).mkString
 }
 
 

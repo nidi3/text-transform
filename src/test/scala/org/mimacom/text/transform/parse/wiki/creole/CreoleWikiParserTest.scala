@@ -271,6 +271,63 @@ class CreoleWikiParserTest extends FlatSpec {
     assert("50%" === list(0)(WIDTH).get)
   }
 
+  behavior of "; and :"
+
+  it should "not be parsed when not at start of line" in {
+    val list = parse("a: \nb;")
+    assert(1 === list.size)
+    assertSegmentEquals(PLAIN, "a: \nb;", list, 0)
+  }
+
+  it should "not be parsed when : comes without ;" in {
+    val list = parse(":nodef")
+    assert(1 === list.size)
+    assertSegmentEquals(PLAIN, ":nodef", list, 0)
+  }
+
+  it should "not be parsed when ; comes without :" in {
+    val list = parse(";nodef")
+    assert(1 === list.size)
+    assertSegmentEquals(PLAIN, ";nodef", list, 0)
+  }
+
+  it should "not be parsed when : does not follow immediately after ;" in {
+    val list = parse(";def \n\n :def")
+    assert(1 === list.size)
+    assertSegmentEquals(PLAIN, ";def \n\n:def", list, 0)
+  }
+
+  it should "be parsed as a definition when : follows immediately after ;" in {
+    val list = parse(";   word\n: def")
+    assert(1 === list.size)
+    assertSegmentEquals(DEFINITION, "word", list, 0)
+    assertSegmentEquals(PLAIN, "def", list, 0, 0)
+  }
+
+  it should "allow formatted definitions" in {
+    val list = parse(";   word\n: **def**")
+    assert(1 === list.size)
+    assertSegmentEquals(DEFINITION, "word", list, 0)
+    assertSegmentEquals(BOLD, null, list, 0, 0)
+    assertSegmentEquals(PLAIN, "def", list, 0, 0, 0)
+  }
+
+  it should "allow multiple definitions" in {
+    val list = parse(";   word\n: **def**\n:def2")
+    assert(1 === list.size)
+    assertSegmentEquals(DEFINITION, "word", list, 0)
+    assertSegmentEquals(BOLD, null, list, 0, 0)
+    assertSegmentEquals(PLAIN, "def", list, 0, 0, 0)
+    assertSegmentEquals(PLAIN, "def2", list, 0, 1)
+  }
+
+  it should "allow width customization" in {
+    val list = parse(";<width=5cm>word\n:def")
+    assert(1 === list.size)
+    assertSegmentEquals(DEFINITION, "word", list, 0)
+    assert("5cm" === list(0)(WIDTH).get)
+  }
+
   behavior of "#"
 
   it should "be ignored when not at start of line" in {
@@ -425,6 +482,22 @@ class CreoleWikiParserTest extends FlatSpec {
     assert("right" === c13(ALIGN).get)
     val c14 = table(Attribute("1,4")).get.asInstanceOf[Segment]
     assert(2 === c14(SPAN).get)
+  }
+
+  behavior of "\\"
+
+  it should "be parsed as a newline" in {
+    val list = parse("a\\\\b")
+    assert(3 === list.size)
+    assertSegmentEquals(PLAIN, "a", list, 0)
+    assertSegmentEquals(NEWLINE, null, list, 1)
+    assertSegmentEquals(PLAIN, "b", list, 2)
+  }
+
+  it should "ignore all whitespaces before it" in {
+    val list = parse("a  \n \r \\\\b")
+    assertSegmentEquals(PLAIN, "a", list, 0)
+    assertSegmentEquals(NEWLINE, null, list, 1)
   }
 
   behavior of "----"

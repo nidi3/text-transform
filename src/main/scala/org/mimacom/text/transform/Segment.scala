@@ -59,8 +59,8 @@ class Segment(val name: Name) extends PseudoSegment {
     this
   }
 
-  def add(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
-  def add(child: Segment): Segment = add(child)
+  def addAttribute(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
+  def addChild(child: Segment): Segment = add(child)
 
   def root: Segment = {
     parent match {
@@ -108,6 +108,8 @@ object Name {
   val LINE = new Name("line")
   val IMAGE = new Name("image")
   val SYMBOL = new Name("symbol")
+  val NEWLINE = new Name("newline")
+  val DEFINITION = new Name("definition")
 }
 
 object Attribute {

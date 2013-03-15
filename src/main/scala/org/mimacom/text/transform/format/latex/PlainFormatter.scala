@@ -18,7 +18,8 @@ object PlainFormatter {
     '^' -> "\\^{}",
     '{' -> "\\{",
     '}' -> "\\}",
-    '[' -> "{[}")
+    '[' -> "{[}",
+    ']' -> "{]}")
 
   def format(context:Context,segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
 

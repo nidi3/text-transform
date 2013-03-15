@@ -31,6 +31,7 @@ class LatexFormatterTest extends FlatSpec {
   it should "simply replace formats" in {
     assertFormat("hallo", plainText("hallo"))
     assertFormat("\\\\ \\hline \\noindent \\\\", Segment(LINE))
+    assertFormat("\\\\", Segment(NEWLINE))
     assertFormat("\\textbf{hallo}", Segment(BOLD, plainText("hallo")))
     assertFormat("\\textit{hallo}", Segment(ITALICS, plainText("hallo")))
   }
@@ -47,6 +48,24 @@ class LatexFormatterTest extends FlatSpec {
       plainText("a"),
       Segment(BOLD, plainText("c"), Segment(ITALICS, plainText("d")), plainText("e")),
       plainText("b"))
+  }
+
+  behavior of "definition"
+
+  it should "translate into description environment" in {
+    assertFormat("\\begin{description}\\item[a]blu\\\\\\textbf{blu2}\\end{description}",
+      Segment(DEFINITION,
+        TEXT -> "a",
+        plainText("blu"),
+        Segment(BOLD, plainText("blu2"))))
+  }
+
+  it should "translate WIDTH property into leftmargin option" in {
+    assertFormat("\\begin{description}[leftmargin=5cm,style=sameline]\\item[a]blu\\end{description}",
+      Segment(DEFINITION,
+        WIDTH -> "5cm",
+        TEXT -> "a",
+        plainText("blu")))
   }
 
   behavior of "list"
@@ -102,7 +121,7 @@ class LatexFormatterTest extends FlatSpec {
   behavior of "special characters"
 
   it should "escape correctly" in {
-    assertFormat("\n \\textbackslash  \\# \\$ \\% \\& \\_ \\{ \\} {[} ] \\~{} \\^{} \"`xxx\"' „xxx\"'",
+    assertFormat("\n \\textbackslash  \\# \\$ \\% \\& \\_ \\{ \\} {[} {]} \\~{} \\^{} \"`xxx\"' „xxx\"'",
       plainText("\n \\ # $ % & _ { } [ ] ~ ^ \"xxx\" „xxx\""))
   }
 

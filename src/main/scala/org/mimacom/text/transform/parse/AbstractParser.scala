@@ -16,6 +16,8 @@ abstract class AbstractParser extends Parser {
   private var _input: String = ""
   private var c: Char = 0
   private var pos: Int = 0
+  private var savedC: Char = 0
+  private var savedPos: Int = 0
 
   val result = ListBuffer[Segment]()
 
@@ -81,9 +83,7 @@ abstract class AbstractParser extends Parser {
     }
   }
 
-
   def currentChar = c
-
 
   def pushBack(n: Int) {
     //TODO take care of "space after newline" logic, see #nextChar
@@ -91,16 +91,18 @@ abstract class AbstractParser extends Parser {
     c = input(pos)
   }
 
-  //
-  //  private void savePos() {
-  //    savePos = pos;
-  //    saveC = c;
-  //  }
-  //
-  //  private void restorePos() {
-  //    c = saveC;
-  //    pos = savePos;
-  //  }
+  def savePos() {
+    savedPos = pos
+    savedC = c
+  }
+
+  def restorePos() = {
+    c = savedC
+    pos = savedPos
+    nextChar()
+    savedC
+  }
+
   //
   //  public String lookAhead(int n) {
   //    savePos();

@@ -13,10 +13,13 @@ class CreoleWikiParser extends AbstractWikiParser {
   private val HTTP = "http:"
   private val HTTPS = "https:"
   private val MINUSES_FOR_LINE = 4
-  private val IMAGE_CUSTOMIZER_WIDTH = "width"
-  private val IMAGE_CUSTOMIZER_HEIGHT = "height"
-  private val IMAGE_CUSTOMIZER_ANGLE = "angle"
-  private val IMAGE_CUSTOMIZER_NONFLOAT = "nonfloat"
+
+  private val CUSTOMIZER_WIDTH = "width"
+  private val CUSTOMIZER_HEIGHT = "height"
+  private val CUSTOMIZER_ANGLE = "angle"
+  private val CUSTOMIZER_NONFLOAT = "nonfloat"
+
+  var defState: Segment = null
 
   protected def handleSpecialChar() {
     currentChar match {
@@ -31,9 +34,52 @@ class CreoleWikiParser extends AbstractWikiParser {
       case '|' => table()
       case '-' => lineOrArrow()
       case '<' => arrow()
+      case '\\' => newline()
+      case ';' => definition()
       case _ =>
         text.append(currentChar)
         nextChar()
+    }
+  }
+
+  private def definition() {
+    if (text.isEmptyOrNewline) {
+      savePos()
+      nextChar()
+      defState = Segment(DEFINITION)
+      val cp = new CustomizerParser(readUntil("\n").dropWhile(_ <= ' '))
+      while (cp.find()) {
+        cp.name match {
+          case CUSTOMIZER_WIDTH => defState.add(WIDTH -> cp.value)
+        }
+      }
+      defState.add(TEXT -> cp.rest)
+      if (currentChar == ':') {
+        while (currentChar == ':') {
+          nextChar()
+          defState.add(parseSub(readUntil("\n").dropWhile(_ <= ' ')): _*)
+        }
+        addToResult(defState)
+      } else {
+        text.append(restorePos())
+      }
+      defState = null
+    } else {
+      text.append(";")
+      nextChar()
+    }
+  }
+
+  private def newline() {
+    if (nextChar() == '\\') {
+      nextChar()
+      while (currentChar <= ' ') {
+        nextChar()
+      }
+      text.trim()
+      addToResult(Segment(NEWLINE))
+    } else {
+      text.append('\\')
     }
   }
 
@@ -54,7 +100,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       text.endsWith(HTTP, HTTPS) match {
         case Some(end) =>
           text.removeLast(end.length)
-          val link = end + "/" + readUntilChar("(,.?!:;\\\"')")
+          val link = end + "/" + readUntilChar("(,.?!:;\\\"') ")
           addToResult(Segment(LINK, TARGET -> link, Segment.plainText(link)))
         case None =>
           nextChar()
@@ -80,10 +126,10 @@ class CreoleWikiParser extends AbstractWikiParser {
       val cp = new CustomizerParser(data)
       while (cp.find()) {
         cp.name match {
-          case IMAGE_CUSTOMIZER_WIDTH => segment.add(WIDTH -> cp.value)
-          case IMAGE_CUSTOMIZER_HEIGHT => segment.add(HEIGHT -> cp.value)
-          case IMAGE_CUSTOMIZER_ANGLE => segment.add(ANGLE -> cp.value)
-          case IMAGE_CUSTOMIZER_NONFLOAT => segment.add(FLOAT -> false)
+          case CUSTOMIZER_WIDTH => segment.add(WIDTH -> cp.value)
+          case CUSTOMIZER_HEIGHT => segment.add(HEIGHT -> cp.value)
+          case CUSTOMIZER_ANGLE => segment.add(ANGLE -> cp.value)
+          case CUSTOMIZER_NONFLOAT => segment.add(FLOAT -> false)
         }
       }
       splitTarget(cp.rest, segment)

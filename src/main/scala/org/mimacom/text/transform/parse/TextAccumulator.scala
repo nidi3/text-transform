@@ -14,6 +14,10 @@ class TextAccumulator() {
     text.append(c)
   }
 
+  def trim() {
+    while (text.last <= ' ') text.deleteCharAt(text.length - 1)
+  }
+
   def reset() {
     text.clear()
   }
