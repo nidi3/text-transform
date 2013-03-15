@@ -57,6 +57,16 @@ class HtmlParserTest extends FlatSpec {
     assertSegmentEquals(PLAIN, " ho", list, 2)
   }
 
+  behavior of "<div>"
+
+  it should "be ignored" in {
+    val list = parse("hey <div>fat</div> ho")
+    assert(3 === list.size)
+    assertSegmentEquals(PLAIN, "hey ", list, 0)
+    assertSegmentEquals(PLAIN, "fat", list, 1)
+    assertSegmentEquals(PLAIN, " ho", list, 2)
+  }
+
   behavior of "<br>"
 
   it should "add an empty line" in {
