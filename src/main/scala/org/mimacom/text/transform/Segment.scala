@@ -60,6 +60,7 @@ class Segment(val name: Name) extends PseudoSegment {
   }
 
   def addAttribute(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
+
   def addChild(child: Segment): Segment = add(child)
 
   def root: Segment = {
@@ -69,28 +70,20 @@ class Segment(val name: Name) extends PseudoSegment {
     }
   }
 
-  override def toString = {
-    val s = new StringBuilder
-    toFormattedString(s, 0)
-    s.toString()
-  }
+  override def toString = toFormattedString(0)
 
-  private def toFormattedString(s: StringBuilder, level: Int) {
-    s.append("  " * level)
-      .append("{")
-      .append(name)
-      .append(", ")
-      .append(attributes)
-    if (children.isEmpty) {
-      s.append("}")
-    } else {
-      s.append(", children=\n")
-      children.foreach(child => {
-        child.toFormattedString(s, level + 1)
-        s.append("\n")
-      })
-      s.append("  " * level).append("}")
+  private def toFormattedString(level: Int): String = {
+    def indent = "  " * level
+    def ch = {
+      if (children.isEmpty) {
+        ""
+      } else {
+        ", children=\n" +
+          children.map(child => child.toFormattedString(level + 1)).mkString("\n") +
+          indent
+      }
     }
+    indent + s"{$name, $attributes $ch}"
   }
 }
 

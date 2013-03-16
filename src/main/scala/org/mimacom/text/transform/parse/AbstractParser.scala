@@ -167,4 +167,10 @@ abstract class AbstractParser extends Parser {
     }
     level
   }
+
+  def skipWhitspaces() {
+    while (currentChar <= ' ') {
+      nextChar()
+    }
+  }
 }

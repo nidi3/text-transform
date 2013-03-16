@@ -43,19 +43,21 @@ class CreoleWikiParser extends AbstractWikiParser {
   }
 
   private def definition() {
+    def readLine() = readUntil("\n").dropWhile(_ <= ' ')
+
     if (text.isEmptyOrNewline) {
       savePos()
       nextChar()
       defState = Segment(DEFINITION)
       defState.add(TEXT ->
-        CustomizerParser(readUntil("\n").dropWhile(_ <= ' '), (name, value) => name match {
+        CustomizerParser(readLine(), (name, value) => name match {
           case CUSTOMIZER_WIDTH => defState.add(WIDTH -> value)
         })
       )
       if (currentChar == ':') {
         while (currentChar == ':') {
           nextChar()
-          defState.add(parseSub(readUntil("\n").dropWhile(_ <= ' ')): _*)
+          defState.add(parseSub(readLine()): _*)
         }
         addToResult(defState)
       } else {
@@ -71,9 +73,7 @@ class CreoleWikiParser extends AbstractWikiParser {
   private def newline() {
     if (nextChar() == '\\') {
       nextChar()
-      while (currentChar <= ' ') {
-        nextChar()
-      }
+      skipWhitspaces()
       text.trim()
       addToResult(Segment(NEWLINE))
     } else {
@@ -170,9 +170,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     } else {
       val level = getCount('=') + initLevel
       val heading = readUntil("=" * level, "\n")
-      while (currentChar <= ' ') {
-        nextChar()
-      }
+      skipWhitspaces()
       if (heading.length > 0) {
         addToResult(Segment(HEADING, LEVEL -> level, Segment.plainText(heading)))
       }
