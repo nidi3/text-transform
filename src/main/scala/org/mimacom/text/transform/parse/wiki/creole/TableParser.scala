@@ -56,19 +56,16 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def handleCellCustomizers() {
-    val cp = new CustomizerParser(cellContent)
-    while (cp.find()) {
-      cp.name match {
+    cellContent =
+      CustomizerParser(cellContent, (name, value) => name match {
         case CUSTOMIZER_COLSPAN =>
-          val span = Integer.parseInt(cp.value)
+          val span = Integer.parseInt(value)
           if (span > 1) {
             cell.add(SPAN -> span)
           }
-        case CUSTOMIZER_WIDTH => table.add(WIDTH.index(targetColumn) -> cp.value)
-        case CUSTOMIZER_ALIGN => cell.add(ALIGN -> cp.value)
-      }
-    }
-    cellContent = cp.rest.trim
+        case CUSTOMIZER_WIDTH => table.add(WIDTH.index(targetColumn) -> value)
+        case CUSTOMIZER_ALIGN => cell.add(ALIGN -> value)
+      }).trim
   }
 
   private def handleHeader() {
@@ -80,7 +77,7 @@ class TableParser(parser: CreoleWikiParser) {
 
   private def handleContent() {
     if (cellContent.length() > 0 || !cell.attributes.isEmpty) {
-      cell.add(parser.parseSub(cellContent):_*)
+      cell.add(parser.parseSub(cellContent): _*)
       table.add(Attribute(rows + "," + targetColumn) -> cell)
     }
   }
@@ -106,12 +103,8 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def handleTableCustomizers(options: String): String = {
-    val cp = new CustomizerParser(options)
-    while (cp.find()) {
-      cp.name match {
-        case CUSTOMIZER_NONFLOAT => table.add(FLOAT -> false)
-      }
-    }
-    cp.rest.trim
+    CustomizerParser(options, (name, value) => name match {
+      case CUSTOMIZER_NONFLOAT => table.add(FLOAT -> false)
+    }).trim
   }
 }

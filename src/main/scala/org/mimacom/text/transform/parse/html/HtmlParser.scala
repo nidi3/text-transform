@@ -29,21 +29,13 @@ class HtmlParser extends Parser {
     parse(xml, 1)(0)
   }
 
-  def nsDefs = {
-    val s = new StringBuilder
-    namespaces.foreach(ns => s.append(s"""xmlns:$ns="$ns" """))
-    s.toString
-  }
+  def nsDefs =
+    namespaces.map(ns => s"""xmlns:$ns="$ns" """).mkString
 
   def namespaces: Seq[String] = Nil
 
-  def parse(xml: Seq[Node],listLevel:Int): Seq[Segment] = {
-    val res = new ListBuffer[Segment]
-    for (node <- xml) {
-      res ++= parse(node,listLevel)
-    }
-    res
-  }
+  def parse(xml: Seq[Node], listLevel: Int): Seq[Segment] =
+    xml.flatMap(n => parse(n, listLevel))
 
   def parse(node: Node,listLevel:Int): Seq[Segment] = {
     node match {

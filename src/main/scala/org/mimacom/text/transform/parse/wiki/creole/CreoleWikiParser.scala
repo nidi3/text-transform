@@ -47,13 +47,11 @@ class CreoleWikiParser extends AbstractWikiParser {
       savePos()
       nextChar()
       defState = Segment(DEFINITION)
-      val cp = new CustomizerParser(readUntil("\n").dropWhile(_ <= ' '))
-      while (cp.find()) {
-        cp.name match {
-          case CUSTOMIZER_WIDTH => defState.add(WIDTH -> cp.value)
-        }
-      }
-      defState.add(TEXT -> cp.rest)
+      defState.add(TEXT ->
+        CustomizerParser(readUntil("\n").dropWhile(_ <= ' '), (name, value) => name match {
+          case CUSTOMIZER_WIDTH => defState.add(WIDTH -> value)
+        })
+      )
       if (currentChar == ':') {
         while (currentChar == ':') {
           nextChar()
@@ -123,16 +121,14 @@ class CreoleWikiParser extends AbstractWikiParser {
   private def image() {
     readUntilClose('{', "}}").map(data => {
       val segment = Segment(IMAGE, FLOAT -> true)
-      val cp = new CustomizerParser(data)
-      while (cp.find()) {
-        cp.name match {
-          case CUSTOMIZER_WIDTH => segment.add(WIDTH -> cp.value)
-          case CUSTOMIZER_HEIGHT => segment.add(HEIGHT -> cp.value)
-          case CUSTOMIZER_ANGLE => segment.add(ANGLE -> cp.value)
+      splitTarget(
+        CustomizerParser(data, (name, value) => name match {
+          case CUSTOMIZER_WIDTH => segment.add(WIDTH -> value)
+          case CUSTOMIZER_HEIGHT => segment.add(HEIGHT -> value)
+          case CUSTOMIZER_ANGLE => segment.add(ANGLE -> value)
           case CUSTOMIZER_NONFLOAT => segment.add(FLOAT -> false)
-        }
-      }
-      splitTarget(cp.rest, segment)
+        }),
+        segment)
     })
   }
 
