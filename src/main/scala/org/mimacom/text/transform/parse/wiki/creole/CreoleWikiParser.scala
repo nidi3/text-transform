@@ -49,7 +49,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     if (text.isEmptyOrNewline) {
       savePos()
       nextChar()
-      defState = DEFINITION
+      defState = DEFINITION()
       defState.add(TEXT ->
         CustomizerParser(readLine(), (name, value) => name match {
           case CUSTOMIZER_WIDTH => defState.add(WIDTH -> value)
@@ -76,7 +76,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       nextChar()
       skipWhitspaces()
       text.trim()
-      addToResult(NEWLINE)
+      addToResult(NEWLINE())
     } else {
       text.append('\\')
     }
@@ -211,7 +211,7 @@ class CreoleWikiParser extends AbstractWikiParser {
   private def line(initCount: Int) {
     val count = getCount('-') + initCount
     if (count >= MINUSES_FOR_LINE) {
-      addToResult(LINE)
+      addToResult(LINE())
     } else {
       text.append("-" * count)
     }

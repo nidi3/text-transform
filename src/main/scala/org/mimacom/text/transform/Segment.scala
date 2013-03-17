@@ -16,6 +16,7 @@ class Const(val name: String) {
 }
 
 class Name private(name: String) extends Const(name) {
+  def apply(values: PseudoSegment*) = Segment(this, values: _*)
 }
 
 class Attribute private(name: String) extends Const(name) {
@@ -102,8 +103,6 @@ class Segment(val name: Name) extends PseudoSegment {
 }
 
 object Name {
-  implicit def Name2Segment(name: Name) = Segment(name)
-
   val ROOT = new Name("root")
   val PLAIN = new Name("plain")
   val BOLD = new Name("bold")

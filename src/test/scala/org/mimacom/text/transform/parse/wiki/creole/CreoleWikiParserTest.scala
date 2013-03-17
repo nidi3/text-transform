@@ -15,7 +15,7 @@ class CreoleWikiParserTest extends ParserTest {
   val parser = new CreoleWikiParser
 
   "simple strings" should "be untouched" in {
-    "" parseTo ROOT
+    "" parseTo ROOT()
     "hey ho" parseTo plain("hey ho")
   }
 
@@ -274,11 +274,11 @@ class CreoleWikiParserTest extends ParserTest {
   behavior of "\\"
 
   it should "be parsed as a newline" in {
-    "a\\\\b" parseTo ROOT(plain("a"), NEWLINE, plain("b"))
+    "a\\\\b" parseTo ROOT(plain("a"), NEWLINE(), plain("b"))
   }
 
   it should "ignore all whitespaces before it" in {
-    "a  \n \r \\\\b" parseTo ROOT(plain("a"), NEWLINE, plain("b"))
+    "a  \n \r \\\\b" parseTo ROOT(plain("a"), NEWLINE(), plain("b"))
   }
 
   behavior of "----"
@@ -288,7 +288,7 @@ class CreoleWikiParserTest extends ParserTest {
   }
 
   it should "be parsed as a line if at least 4 length" in {
-    "----bla" parseTo ROOT(LINE, plain("bla"))
+    "----bla" parseTo ROOT(LINE(), plain("bla"))
   }
 
   behavior of "<,>,-,= combined to arrows"

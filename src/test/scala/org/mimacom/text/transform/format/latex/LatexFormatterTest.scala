@@ -23,8 +23,8 @@ class LatexFormatterTest extends FormatterTest {
 
   it should "simply replace formats" in {
     "hallo" formatOf plain("hallo")
-    "\\\\ \\hline \\noindent \\\\" formatOf LINE
-    "\\\\" formatOf NEWLINE
+    "\\\\ \\hline \\noindent \\\\" formatOf LINE()
+    "\\\\" formatOf NEWLINE()
     "\\textbf{hallo}" formatOf BOLD(plain("hallo"))
     "\\textit{hallo}" formatOf ITALICS(plain("hallo"))
   }

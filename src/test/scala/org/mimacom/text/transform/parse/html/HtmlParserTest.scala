@@ -14,14 +14,14 @@ class HtmlParserTest extends ParserTest {
   val parser = new HtmlParser
 
   "simple strings" should "be untouched" in {
-    "" parseTo ROOT
+    "" parseTo ROOT()
     "hey ho" parseTo plain("hey ho")
   }
 
   behavior of "<p>"
 
   it should "add a newline" in {
-    "hey <p>fat</p> ho" parseTo ROOT(plain("hey "), NEWLINE, plain("fat"), NEWLINE, plain(" ho"))
+    "hey <p>fat</p> ho" parseTo ROOT(plain("hey "), NEWLINE(), plain("fat"), NEWLINE(), plain(" ho"))
   }
 
   behavior of "<span>"
@@ -39,13 +39,13 @@ class HtmlParserTest extends ParserTest {
   behavior of "<br>"
 
   it should "add a newline" in {
-    "hey <br/><br /><br></br> ho" parseTo ROOT(plain("hey "), NEWLINE, NEWLINE, NEWLINE, plain(" ho"))
+    "hey <br/><br /><br></br> ho" parseTo ROOT(plain("hey "), NEWLINE(), NEWLINE(), NEWLINE(), plain(" ho"))
   }
 
   behavior of "<hr>"
 
   it should "be parsed as line" in {
-    "hey <hr/> ho" parseTo ROOT(plain("hey "), LINE, plain(" ho"))
+    "hey <hr/> ho" parseTo ROOT(plain("hey "), LINE(), plain(" ho"))
   }
 
   behavior of "<strong>"

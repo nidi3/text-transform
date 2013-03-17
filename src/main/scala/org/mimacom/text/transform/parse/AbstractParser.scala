@@ -27,7 +27,7 @@ abstract class AbstractParser extends Parser {
     pos = 0
     nextChar()
     reset()
-    val root = ROOT
+    val root = ROOT()
     doParse()
     root.add(result: _*)
   }
