@@ -1,9 +1,9 @@
 package org.mimacom.text.transform
 
-import collection.mutable.Map
 import collection.mutable.ListBuffer
 import Attribute._
 import Name._
+import collection.mutable
 
 trait PseudoSegment
 
@@ -20,7 +20,7 @@ class Name private(name: String) extends Const(name) {
 }
 
 class Attribute private(name: String) extends Const(name) {
-  def index(index: Int) = new Attribute(name + index)
+  def apply(index: Int) = new Attribute(name + index)
 
   def ->(value: Any) = new AttributePair(this, value)
 }
@@ -30,12 +30,12 @@ class AttributePair(name: Attribute, value: Any) extends Pair(name, value) with 
 class AttributeValue private(name: String) extends Const(name)
 
 /**
- * A Segment is an abstract representation of a text. It is produced by a {@link org.mimacom.text.transform.Parser}
- * and consumed by a {@link Formatter}.
+ * A Segment is an abstract representation of a text. It is produced by a `org.mimacom.text.transform.Parser`
+ * and consumed by a `org.mimacom.text.transform.Formatter`
  * A Segment is defined by its name, a map of attributes and a list of child segments.
  */
 class Segment(val name: Name) extends PseudoSegment {
-  val attributes = Map[Attribute, Any]()
+  val attributes = mutable.Map[Attribute, Any]()
   val children = ListBuffer[Segment]()
   private var _parent: Option[Segment] = None
 

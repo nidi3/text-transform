@@ -30,5 +30,5 @@ class TextAccumulator() {
     text.setLength(text.length - n)
   }
 
-  override def toString = text.toString
+  override def toString = text.toString()
 }

@@ -64,7 +64,7 @@ class TableParser(parser: CreoleWikiParser) {
           if (span > 1) {
             cell.add(SPAN -> span)
           }
-        case CUSTOMIZER_WIDTH => table.add(WIDTH.index(targetColumn) -> value)
+        case CUSTOMIZER_WIDTH => table.add(WIDTH(targetColumn) -> value)
         case CUSTOMIZER_ALIGN => cell.add(ALIGN -> value)
       }).trim
   }

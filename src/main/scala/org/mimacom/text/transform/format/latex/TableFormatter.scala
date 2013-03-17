@@ -15,7 +15,6 @@ object TableFormatter {
 class TableFormatter(context: Context, segment: Segment) {
   val rows = segment(ROWS).get.asInstanceOf[Int]
   val cols = segment(COLUMNS).get.asInstanceOf[Int]
-  private var currentCol = 0
 
   def format: String = {
     val caption = segment(CAPTION).asInstanceOf[Option[Segment]]
@@ -35,8 +34,8 @@ class TableFormatter(context: Context, segment: Segment) {
 
   private def transformFloatCaption(caption: Option[Segment]) = {
     caption match {
-      case Some(segment) =>
-        val desc = LatexFormatter.format(context, segment)
+      case Some(seg) =>
+        val desc = LatexFormatter.format(context, seg)
         s"\n\\caption{$desc} \\label{table:$desc}"
       case _ => ""
     }
@@ -50,8 +49,8 @@ class TableFormatter(context: Context, segment: Segment) {
 
   private def tranformNonfloatCaption(caption: Option[Segment]) = {
     caption match {
-      case Some(segment) =>
-        val desc = LatexFormatter.format(context, segment)
+      case Some(seg) =>
+        val desc = LatexFormatter.format(context, seg)
         s"\n\\captionof{table}{$desc} \\label{table:$desc}"
       case _ => ""
     }
@@ -59,30 +58,38 @@ class TableFormatter(context: Context, segment: Segment) {
 
   private def transformTable = {
     env("tabular") {
-      val s = new StringBuilder("{" + columnsStyle + "}\n")
-      for (row <- 1 to rows) {
-        s.append(transformRow(row))
-      }
-      s.toString
+      s"{$columnsStyle}\n" + (1 to rows).map(row => transformRow(row)).mkString
     }
   }
 
   private def columnsStyle = {
-    val s = new StringBuilder
-    for (i <- 1 to cols) {
-      s.append(
-        segment(WIDTH.index(i)) match {
-          case Some(width) => "p{" + width + "} "
-          case _ => "l "
-        })
-    }
-    s
+    (1 to cols).map(col => segment(WIDTH(col)) match {
+      case Some(width) => "p{" + width + "} "
+      case _ => "l "
+    }).mkString
   }
 
   private def transformRow(row: Int) = {
+    var currentCol = 1
+
+    def transformCell(cell: Segment) = {
+      val content =
+        (cell(ALIGN) match {
+          case Some(LEFT) => "\\raggedright "
+          case Some(RIGHT) => "\\raggedleft "
+          case _ => ""
+        }) + LatexFormatter.formatChildren(context, cell)
+
+      cell(SPAN) match {
+        case Some(span: Int) =>
+          currentCol += span - 1
+          s"\\multicolumn{$span}{l}{$content}"
+        case _ => content
+      }
+    }
+
     val s = new StringBuilder
     var header = false
-    currentCol = 1
     while (currentCol <= cols) {
       segment(Attribute(row + "," + currentCol)) match {
         case Some(cell: Segment) =>
@@ -97,24 +104,6 @@ class TableFormatter(context: Context, segment: Segment) {
       currentCol += 1
     }
     s
-  }
-
-  private def transformCell(cell: Segment) = {
-    val res = new StringBuilder
-    res.append(
-      cell(ALIGN) match {
-        case Some(LEFT) => "\\raggedright "
-        case Some(RIGHT) => "\\raggedleft "
-        case _ => ""
-      })
-    res.append(LatexFormatter.formatChildren(context, cell))
-
-    cell(SPAN) match {
-      case Some(span: Int) =>
-        currentCol += span - 1
-        s"\\multicolumn{$span}{l}{$res}"
-      case _ => res
-    }
   }
 
   private def transformEndOfRow(last: Boolean, header: Boolean) = {

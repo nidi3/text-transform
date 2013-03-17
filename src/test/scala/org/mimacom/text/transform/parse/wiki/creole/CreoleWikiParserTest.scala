@@ -265,7 +265,7 @@ class CreoleWikiParserTest extends ParserTest {
 
   it should "allow customizers for colspan, width, align" in {
     "|<colspan=2>a|<width=5cm><align=right>b|<width=6pt><colspan=2>|" parseTo TABLE(
-      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH.index(3) -> "5cm", WIDTH.index(4) -> "6pt",
+      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH(3) -> "5cm", WIDTH(4) -> "6pt",
       Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a")),
       Attribute("1,3") -> TABLE_CELL(ALIGN -> "right", plain("b")),
       Attribute("1,4") -> TABLE_CELL(SPAN -> 2))

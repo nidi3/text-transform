@@ -44,6 +44,6 @@ object PlainFormatter {
           }
       }
     })
-    res.toString
+    res.toString()
   }
 }

@@ -170,7 +170,7 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "understand width attribute" in {
-    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table.add(WIDTH.index(1) -> "5cm")
+    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table.add(WIDTH(1) -> "5cm")
   }
 
   it should "underline the header" in {
