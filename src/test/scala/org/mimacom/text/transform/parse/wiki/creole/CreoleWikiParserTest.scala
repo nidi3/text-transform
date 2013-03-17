@@ -143,7 +143,7 @@ class CreoleWikiParserTest extends ParserTest {
     "{{<width=50%>link}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", WIDTH -> "50%", plain("link"))
   }
 
-  behavior of "; and :"
+  behavior of ";"
 
   it should "not be parsed when not at start of line" in {
     "a: \nb;" parseTo plain("a: \nb;")
@@ -153,12 +153,12 @@ class CreoleWikiParserTest extends ParserTest {
     ":nodef" parseTo plain(":nodef")
   }
 
-  it should "not be parsed when ; comes without :" in {
-    ";nodef" parseTo plain(";nodef")
+  it should ": can be left out" in {
+    ";nodef" parseTo DEFINITION(TEXT -> "nodef")
   }
 
-  it should "not be parsed when : does not follow immediately after ;" in {
-    ";def \n\n :def" parseTo plain(";def \n\n:def")
+  it should "ignore : if it does not follow immediately after ;" in {
+    ";word \n\n :def" parseTo ROOT(DEFINITION(TEXT -> "word "), plain("\n:def"))
   }
 
   it should "be parsed as a definition when : follows immediately after ;" in {
@@ -237,8 +237,8 @@ class CreoleWikiParserTest extends ParserTest {
   }
 
   it should "not keep state between to executions" in {
-    "#a" parseTo LIST(LEVEL->1,TYPE -> ORDERED, ITEM(plain("a")))
-    "#a" parseTo LIST(LEVEL->1,TYPE -> ORDERED, ITEM(plain("a")))
+    "#a" parseTo LIST(LEVEL -> 1, TYPE -> ORDERED, ITEM(plain("a")))
+    "#a" parseTo LIST(LEVEL -> 1, TYPE -> ORDERED, ITEM(plain("a")))
   }
 
   behavior of "|"
@@ -253,11 +253,11 @@ class CreoleWikiParserTest extends ParserTest {
         Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
         Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")),
         Attribute("2,1") -> TABLE_CELL(plain("a")),
-        Attribute("2,2") -> TABLE_CELL( plain("b")),
-        Attribute("3,1") -> TABLE_CELL( plain("c")),
-        Attribute("4,1") -> TABLE_CELL( BOLD(plain("d")), plain("e")),
-        Attribute("4,2") -> TABLE_CELL( plain("f")),
-        Attribute("4,3") -> TABLE_CELL( plain("g")),
+        Attribute("2,2") -> TABLE_CELL(plain("b")),
+        Attribute("3,1") -> TABLE_CELL(plain("c")),
+        Attribute("4,1") -> TABLE_CELL(BOLD(plain("d")), plain("e")),
+        Attribute("4,2") -> TABLE_CELL(plain("f")),
+        Attribute("4,3") -> TABLE_CELL(plain("g")),
         CAPTION -> plain("This table show interesting \"data\"")),
       plain("next"))
   }

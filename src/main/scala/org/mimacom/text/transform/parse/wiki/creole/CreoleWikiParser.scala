@@ -20,8 +20,6 @@ class CreoleWikiParser extends AbstractWikiParser {
   private val CUSTOMIZER_ANGLE = "angle"
   private val CUSTOMIZER_NONFLOAT = "nonfloat"
 
-  var defState: Segment = null
-
   protected def handleSpecialChar() {
     currentChar match {
       case '*' => boldOrList()
@@ -47,24 +45,18 @@ class CreoleWikiParser extends AbstractWikiParser {
     def readLine() = readUntil("\n").dropWhile(_ <= ' ')
 
     if (text.isEmptyOrNewline) {
-      savePos()
       nextChar()
-      defState = DEFINITION()
-      defState.add(TEXT ->
+      val definition = DEFINITION()
+      definition.add(TEXT ->
         CustomizerParser(readLine(), (name, value) => name match {
-          case CUSTOMIZER_WIDTH => defState.add(WIDTH -> value)
+          case CUSTOMIZER_WIDTH => definition.add(WIDTH -> value)
         })
       )
-      if (currentChar == ':') {
-        while (currentChar == ':') {
-          nextChar()
-          defState.add(ITEM(parseSub(readLine()): _*))
-        }
-        addToResult(defState)
-      } else {
-        text.append(restorePos())
+      while (currentChar == ':') {
+        nextChar()
+        definition.add(ITEM(parseSub(readLine()): _*))
       }
-      defState = null
+      addToResult(definition)
     } else {
       text.append(";")
       nextChar()
