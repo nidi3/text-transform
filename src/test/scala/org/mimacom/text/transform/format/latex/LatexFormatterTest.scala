@@ -136,16 +136,16 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "understand absolute width attribute" in {
-    start + "width=5cm" + end formatOf image.add(WIDTH -> "5cm")
+    start + "width=5cm" + end formatOf image(WIDTH -> "5cm")
   }
 
   it should "understand relative width attribute" in {
-    start + "width=0.55\\textwidth" + end formatOf image.add(WIDTH -> "55%")
+    start + "width=0.55\\textwidth" + end formatOf image(WIDTH -> "55%")
   }
 
   it should "understand angle attribute and support multiple attributes" in {
     start + "height=0.1\\textheight,angle=45" + end formatOf
-      image.add(ANGLE -> "45", HEIGHT -> "10%", WIDTH -> null)
+      image(ANGLE -> "45", HEIGHT -> "10%", WIDTH -> null)
   }
 
   it should "show an error message it cannot be found" in {
@@ -170,27 +170,27 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "understand width attribute" in {
-    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table.add(WIDTH(1) -> "5cm")
+    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table(WIDTH(1) -> "5cm")
   }
 
   it should "underline the header" in {
     prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \\hline\n" + postfix formatOf
-      table.add(Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("a1")))
+      table(Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("a1")))
   }
 
   it should "translate align left into raggedright" in {
     prefix + "{p{5cm} l }\n" + "\\raggedright a1&\\tabularnewline \n" + postfix formatOf
-      table.add(Attribute("1,1") -> TABLE_CELL(ALIGN -> LEFT, plain("a1")))
+      table(Attribute("1,1") -> TABLE_CELL(ALIGN -> LEFT, plain("a1")))
   }
 
   it should "translate align right into reggedleft" in {
     prefix + "{p{5cm} l }\n" + "\\raggedleft a1&\\tabularnewline \n" + postfix formatOf
-      table.add(Attribute("1,1") -> TABLE_CELL(ALIGN -> RIGHT, plain("a1")))
+      table(Attribute("1,1") -> TABLE_CELL(ALIGN -> RIGHT, plain("a1")))
   }
 
   it should "translate span into multicolumn" in {
     prefix + "{p{5cm} l }\n" + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
-      table.add(Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a1")))
+      table(Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a1")))
   }
 
   it should "translate into a simple tabular environment if not floating" in {

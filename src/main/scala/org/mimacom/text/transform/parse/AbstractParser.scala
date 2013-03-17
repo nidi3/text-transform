@@ -29,7 +29,7 @@ abstract class AbstractParser extends Parser {
     reset()
     val root = ROOT()
     doParse()
-    root.add(result: _*)
+    root(result: _*)
   }
 
   def doParse()

@@ -62,24 +62,24 @@ class TableParser(parser: CreoleWikiParser) {
         case CUSTOMIZER_COLSPAN =>
           val span = Integer.parseInt(value)
           if (span > 1) {
-            cell.add(SPAN -> span)
+            cell(SPAN -> span)
           }
-        case CUSTOMIZER_WIDTH => table.add(WIDTH(targetColumn) -> value)
-        case CUSTOMIZER_ALIGN => cell.add(ALIGN -> value)
+        case CUSTOMIZER_WIDTH => table(WIDTH(targetColumn) -> value)
+        case CUSTOMIZER_ALIGN => cell(ALIGN -> value)
       }).trim
   }
 
   private def handleHeader() {
     if (cellContent.length() > 0 && cellContent.charAt(0) == '=') {
-      cell.add(HEADER -> true)
+      cell(HEADER -> true)
       cellContent = cellContent.substring(1)
     }
   }
 
   private def handleContent() {
     if (cellContent.length() > 0 || !cell.attributes.isEmpty) {
-      cell.add(parser.parseSub(cellContent): _*)
-      table.add(Attribute(rows + "," + targetColumn) -> cell)
+      cell(parser.parseSub(cellContent): _*)
+      table(Attribute(rows + "," + targetColumn) -> cell)
     }
   }
 
@@ -92,20 +92,20 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def parseTableOptions() {
-    table.add(FLOAT -> true, ROWS -> rows, COLUMNS -> columns)
+    table(FLOAT -> true, ROWS -> rows, COLUMNS -> columns)
 
     if (parser.currentChar == '!') {
       val options = parser.readUntil("\n").substring(1)
       val caption = handleTableCustomizers(options)
       if (caption.length > 0) {
-        table.add(CAPTION -> plain(caption))
+        table(CAPTION -> plain(caption))
       }
     }
   }
 
   private def handleTableCustomizers(options: String): String = {
     CustomizerParser(options, (name, value) => name match {
-      case CUSTOMIZER_NONFLOAT => table.add(FLOAT -> false)
+      case CUSTOMIZER_NONFLOAT => table(FLOAT -> false)
     }).trim
   }
 }

@@ -49,19 +49,19 @@ class HtmlParser extends Parser {
       case <br/> => List(NEWLINE())
       case <hr/> => List(LINE())
       case <em>{ns @ _*}</em> if (!ns.isEmpty) => List(ITALICS(parse(ns,listLevel): _*))
-      case <h1>{ns @ _*}</h1> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->1))
-      case <h2>{ns @ _*}</h2> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->2))
-      case <h3>{ns @ _*}</h3> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->3))
-      case <h4>{ns @ _*}</h4> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->4))
-      case <h5>{ns @ _*}</h5> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->5))
-      case <h6>{ns @ _*}</h6> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*).add(LEVEL->6))
-      case <ol>{ns @ _*}</ol> if (!ns.isEmpty) => List(LIST(parse(ns,listLevel+1): _*).add(TYPE->AttributeValue.ORDERED,LEVEL->listLevel))
-      case <ul>{ns @ _*}</ul> if (!ns.isEmpty) => List(LIST(parse(ns,listLevel+1): _*).add(TYPE->AttributeValue.UNORDERED,LEVEL->listLevel))
+      case <h1>{ns @ _*}</h1> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->1))
+      case <h2>{ns @ _*}</h2> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->2))
+      case <h3>{ns @ _*}</h3> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->3))
+      case <h4>{ns @ _*}</h4> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->4))
+      case <h5>{ns @ _*}</h5> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->5))
+      case <h6>{ns @ _*}</h6> if (!ns.isEmpty) => List(HEADING(parse(ns,listLevel): _*)(LEVEL->6))
+      case <ol>{ns @ _*}</ol> if (!ns.isEmpty) => List(LIST(parse(ns,listLevel+1): _*)(TYPE->AttributeValue.ORDERED,LEVEL->listLevel))
+      case <ul>{ns @ _*}</ul> if (!ns.isEmpty) => List(LIST(parse(ns,listLevel+1): _*)(TYPE->AttributeValue.UNORDERED,LEVEL->listLevel))
       case <li>{ns @ _*}</li> if (!ns.isEmpty) => List(ITEM(parse(ns,listLevel): _*))
       case n @ <a>{ns @ _*}</a> =>
         val href = (n \ "@href").text
         val desc = if (ns.isEmpty) List(plain(href)) else parse(ns, listLevel)
-        List(LINK(desc: _*).add(TARGET -> href, TYPE -> URL))
+        List(LINK(desc: _*)(TARGET -> href, TYPE -> URL))
       case Text(t) =>
         val list = new ListBuffer[Segment]
         val s = new StringBuffer

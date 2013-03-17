@@ -70,7 +70,7 @@ class ListParser(parser: AbstractWikiParser,listState:ListState, listType: Attri
     while (!parser.isCurrentCharOneOf("#*\n" + EOI)) {
       content.append("\n").append(parser.readUntil("\n"))
     }
-    listState.currentList.add(ITEM(parser.parseSub(content.toString()): _*))
+    listState.currentList(ITEM(parser.parseSub(content.toString()): _*))
   }
 
   private def handleNewlines() {

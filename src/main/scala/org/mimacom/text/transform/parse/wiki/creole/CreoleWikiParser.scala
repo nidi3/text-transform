@@ -47,14 +47,14 @@ class CreoleWikiParser extends AbstractWikiParser {
     if (text.isEmptyOrNewline) {
       nextChar()
       val definition = DEFINITION()
-      definition.add(TEXT ->
+      definition(TEXT ->
         CustomizerParser(readLine(), (name, value) => name match {
-          case CUSTOMIZER_WIDTH => definition.add(WIDTH -> value)
+          case CUSTOMIZER_WIDTH => definition(WIDTH -> value)
         })
       )
       while (currentChar == ':') {
         nextChar()
-        definition.add(ITEM(parseSub(readLine()): _*))
+        definition(ITEM(parseSub(readLine()): _*))
       }
       addToResult(definition)
     } else {
@@ -113,15 +113,15 @@ class CreoleWikiParser extends AbstractWikiParser {
 
   private def image() {
     readUntilClose('{', "}}").map(data => {
-      val segment = IMAGE(FLOAT -> true)
+      val image = IMAGE(FLOAT -> true)
       splitTarget(
         CustomizerParser(data, (name, value) => name match {
-          case CUSTOMIZER_WIDTH => segment.add(WIDTH -> value)
-          case CUSTOMIZER_HEIGHT => segment.add(HEIGHT -> value)
-          case CUSTOMIZER_ANGLE => segment.add(ANGLE -> value)
-          case CUSTOMIZER_NONFLOAT => segment.add(FLOAT -> false)
+          case CUSTOMIZER_WIDTH => image(WIDTH -> value)
+          case CUSTOMIZER_HEIGHT => image(HEIGHT -> value)
+          case CUSTOMIZER_ANGLE => image(ANGLE -> value)
+          case CUSTOMIZER_NONFLOAT => image(FLOAT -> false)
         }),
-        segment)
+        image)
     })
   }
 
@@ -139,8 +139,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     val pos = data.indexOf('|')
     val target = data.substring(0, if (pos < 0) data.length else pos)
     val desc = data.substring(pos + 1)
-    segment.add(parseSub(desc): _*)
-    segment.add(TARGET -> target)
+    segment(parseSub(desc): _*)(TARGET -> target)
     addToResult(segment)
   }
 
