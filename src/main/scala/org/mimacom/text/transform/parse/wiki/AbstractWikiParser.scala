@@ -4,6 +4,7 @@ package org.mimacom.text.transform.parse.wiki
 import org.mimacom.text.transform.parse.{TextAccumulator, AbstractParser}
 import org.mimacom.text.transform.Segment
 import org.mimacom.text.transform.AttributeValue._
+import org.mimacom.text.transform.Segment._
 
 
 /**
@@ -41,7 +42,7 @@ abstract class AbstractWikiParser extends AbstractParser {
 
   protected def addPlainTextAt(resultPos: Int) {
     if (!text.toString.isEmpty) {
-      addToResult(resultPos, Segment.plainText(text.toString))
+      addToResult(resultPos, plain(text.toString))
       text.reset()
     }
   }
@@ -65,9 +66,9 @@ abstract class AbstractWikiParser extends AbstractParser {
       } else {
         nextChar()
         if (first == '-') {
-          addToResult(Segment.symbol("-->", ARROW_RIGHT))
+          addToResult(symbol("-->", ARROW_RIGHT))
         } else {
-          addToResult(Segment.symbol("==>", DOUBLE_ARROW_RIGHT))
+          addToResult(symbol("==>", DOUBLE_ARROW_RIGHT))
         }
       }
     }
@@ -81,9 +82,9 @@ abstract class AbstractWikiParser extends AbstractParser {
         } else {
           if (nextChar() == '>') {
             nextChar()
-            addToResult(Segment.symbol("<-->", ARROW_BOTH))
+            addToResult(symbol("<-->", ARROW_BOTH))
           } else {
-            addToResult(Segment.symbol("<--", ARROW_LEFT))
+            addToResult(symbol("<--", ARROW_LEFT))
           }
         }
       case '=' =>
@@ -92,9 +93,9 @@ abstract class AbstractWikiParser extends AbstractParser {
         } else {
           if (nextChar() == '>') {
             nextChar()
-            addToResult(Segment.symbol("<==>", DOUBLE_ARROW_BOTH))
+            addToResult(symbol("<==>", DOUBLE_ARROW_BOTH))
           } else {
-            addToResult(Segment.symbol("<==", DOUBLE_ARROW_LEFT))
+            addToResult(symbol("<==", DOUBLE_ARROW_LEFT))
           }
         }
       case _ =>

@@ -42,7 +42,7 @@ class ListParser(parser: AbstractWikiParser,listState:ListState, listType: Attri
   private def addChildLists(level: Int) {
     val currentLevel = listState.getLevel
     for (l <- currentLevel + 1 to level) {
-      listState.gotoChild(Segment(LIST, TYPE -> listType, LEVEL -> l))
+      listState.gotoChild(LIST(TYPE -> listType, LEVEL -> l))
     }
   }
 
@@ -52,7 +52,7 @@ class ListParser(parser: AbstractWikiParser,listState:ListState, listType: Attri
   }
 
   private def addFirstLevelList() {
-    listState.currentList = Segment(LIST, TYPE -> listType, LEVEL -> 1)
+    listState.currentList = LIST(TYPE -> listType, LEVEL -> 1)
     parser.addToResult(listState.currentList)
   }
 
@@ -70,7 +70,7 @@ class ListParser(parser: AbstractWikiParser,listState:ListState, listType: Attri
     while (!parser.isCurrentCharOneOf("#*\n" + EOI)) {
       content.append("\n").append(parser.readUntil("\n"))
     }
-    listState.currentList.add(Segment(LIST_ITEM, parser.parseSub(content.toString()): _*))
+    listState.currentList.add(ITEM(parser.parseSub(content.toString()): _*))
   }
 
   private def handleNewlines() {

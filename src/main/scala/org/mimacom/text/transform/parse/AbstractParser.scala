@@ -1,7 +1,8 @@
 package org.mimacom.text.transform.parse
 
 import collection.mutable.ListBuffer
-import org.mimacom.text.transform.{Parser, Name, Segment}
+import org.mimacom.text.transform.{Parser, Segment}
+import org.mimacom.text.transform.Name._
 import AbstractParser.EOI
 
 /**
@@ -26,7 +27,7 @@ abstract class AbstractParser extends Parser {
     pos = 0
     nextChar()
     reset()
-    val root = Segment(Name.ROOT)
+    val root = ROOT
     doParse()
     root.add(result: _*)
   }
@@ -63,7 +64,6 @@ abstract class AbstractParser extends Parser {
     c = fetchNextChar()
     c
   }
-
 
   private def fetchNextChar(): Char = {
     if (pos >= input.length) {

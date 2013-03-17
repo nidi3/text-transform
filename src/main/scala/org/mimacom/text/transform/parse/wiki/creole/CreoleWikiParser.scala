@@ -3,6 +3,7 @@ package org.mimacom.text.transform.parse.wiki.creole
 import org.mimacom.text.transform.{AttributeValue, Segment}
 import org.mimacom.text.transform.AttributeValue._
 import org.mimacom.text.transform.Name._
+import org.mimacom.text.transform.Segment._
 import org.mimacom.text.transform.Attribute._
 import org.mimacom.text.transform.parse.wiki.{ListParser, AbstractWikiParser}
 
@@ -48,7 +49,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     if (text.isEmptyOrNewline) {
       savePos()
       nextChar()
-      defState = Segment(DEFINITION)
+      defState = DEFINITION
       defState.add(TEXT ->
         CustomizerParser(readLine(), (name, value) => name match {
           case CUSTOMIZER_WIDTH => defState.add(WIDTH -> value)
@@ -57,7 +58,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       if (currentChar == ':') {
         while (currentChar == ':') {
           nextChar()
-          defState.add(parseSub(readLine()): _*)
+          defState.add(ITEM(parseSub(readLine()): _*))
         }
         addToResult(defState)
       } else {
@@ -75,7 +76,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       nextChar()
       skipWhitspaces()
       text.trim()
-      addToResult(Segment(NEWLINE))
+      addToResult(NEWLINE)
     } else {
       text.append('\\')
     }
@@ -88,7 +89,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       nextChar()
       val bold = readUntil("**")
       if (bold.length > 0) {
-        addToResult(Segment(BOLD, parseSub(bold): _*))
+        addToResult(BOLD(parseSub(bold): _*))
       }
     }
   }
@@ -99,12 +100,12 @@ class CreoleWikiParser extends AbstractWikiParser {
         case Some(end) =>
           text.removeLast(end.length)
           val link = end + "/" + readUntilChar("(,.?!:;\\\"') ")
-          addToResult(Segment(LINK, TARGET -> link, Segment.plainText(link)))
+          addToResult(LINK(TYPE -> URL, TARGET -> link, plain(link)))
         case None =>
           nextChar()
           val italics = readUntil("//")
           if (italics.length > 0) {
-            addToResult(Segment(ITALICS, parseSub(italics): _*))
+            addToResult(ITALICS(parseSub(italics): _*))
           }
       }
     } else {
@@ -114,13 +115,13 @@ class CreoleWikiParser extends AbstractWikiParser {
 
   private def link() {
     readUntilClose('[', "]]").map(data => {
-      splitTarget(data, Segment(LINK))
+      splitTarget(data, LINK(TYPE -> URL))
     })
   }
 
   private def image() {
     readUntilClose('{', "}}").map(data => {
-      val segment = Segment(IMAGE, FLOAT -> true)
+      val segment = IMAGE(FLOAT -> true)
       splitTarget(
         CustomizerParser(data, (name, value) => name match {
           case CUSTOMIZER_WIDTH => segment.add(WIDTH -> value)
@@ -172,7 +173,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       val heading = readUntil("=" * level, "\n")
       skipWhitspaces()
       if (heading.length > 0) {
-        addToResult(Segment(HEADING, LEVEL -> level, Segment.plainText(heading)))
+        addToResult(HEADING(LEVEL -> level, plain(heading)))
       }
     }
   }
@@ -210,7 +211,7 @@ class CreoleWikiParser extends AbstractWikiParser {
   private def line(initCount: Int) {
     val count = getCount('-') + initCount
     if (count >= MINUSES_FOR_LINE) {
-      addToResult(Segment(LINE))
+      addToResult(LINE)
     } else {
       text.append("-" * count)
     }

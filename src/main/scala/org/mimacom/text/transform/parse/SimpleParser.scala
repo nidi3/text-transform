@@ -1,12 +1,12 @@
 package org.mimacom.text.transform.parse
 
-import org.mimacom.text.transform.Segment
+import org.mimacom.text.transform.Segment._
 
 /**
  *
  */
 class SimpleParser extends AbstractParser {
-  def doParse {
-    addToResult(Segment.plainText(input))
+  def doParse() {
+    addToResult(plain(input))
   }
 }

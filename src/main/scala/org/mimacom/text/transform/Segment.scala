@@ -28,7 +28,6 @@ class AttributePair(name: Attribute, value: Any) extends Pair(name, value) with 
 
 class AttributeValue private(name: String) extends Const(name)
 
-
 /**
  * A Segment is an abstract representation of a text. It is produced by a {@link org.mimacom.text.transform.Parser}
  * and consumed by a {@link Formatter}.
@@ -40,6 +39,8 @@ class Segment(val name: Name) extends PseudoSegment {
   private var _parent: Option[Segment] = None
 
   def apply(name: Attribute): Option[Any] = attributes.get(name)
+
+  def apply(values: PseudoSegment*) = add(values: _*)
 
   def parent = this._parent
 
@@ -85,9 +86,24 @@ class Segment(val name: Name) extends PseudoSegment {
     }
     indent + s"{$name, $attributes $ch}"
   }
+
+  override def equals(other: Any) = {
+    if (!other.isInstanceOf[Segment]) false
+    else {
+      val s = other.asInstanceOf[Segment]
+      s.attributes == attributes && s.children == children
+    }
+  }
+
+  override def hashCode = {
+    (attributes.hashCode + children.hashCode * 31)
+  }
+
 }
 
 object Name {
+  implicit def Name2Segment(name: Name) = Segment(name)
+
   val ROOT = new Name("root")
   val PLAIN = new Name("plain")
   val BOLD = new Name("bold")
@@ -95,7 +111,7 @@ object Name {
   val HEADING = new Name("heading")
   val LINK = new Name("link")
   val LIST = new Name("list")
-  val LIST_ITEM = new Name("listItem")
+  val ITEM = new Name("item")
   val TABLE = new Name("table")
   val TABLE_CELL = new Name("tableCell")
   val LINE = new Name("line")
@@ -136,12 +152,15 @@ object AttributeValue {
   val DOUBLE_ARROW_BOTH = new AttributeValue("dbarr")
   val LEFT = new AttributeValue("left")
   val RIGHT = new AttributeValue("right")
+  val FILE = new AttributeValue("file")
+  val DOCUMENT = new AttributeValue("document")
+  val URL = new AttributeValue("url")
 }
 
 object Segment {
   def apply(name: Name, children: PseudoSegment*): Segment = new Segment(name).add(children: _*)
 
-  def plainText(text: String): Segment = Segment(PLAIN, TEXT -> text)
+  def plain(text: String): Segment = PLAIN(TEXT -> text)
 
-  def symbol(original: String, typ: AttributeValue): Segment = Segment(SYMBOL, ORIGINAL -> original, TYPE -> typ)
+  def symbol(original: String, typ: AttributeValue): Segment = SYMBOL(ORIGINAL -> original, TYPE -> typ)
 }

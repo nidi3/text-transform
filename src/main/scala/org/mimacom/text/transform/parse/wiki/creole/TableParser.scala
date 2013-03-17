@@ -3,6 +3,7 @@ package org.mimacom.text.transform.parse.wiki.creole
 import org.mimacom.text.transform.{Attribute, Segment}
 import org.mimacom.text.transform.Name._
 import org.mimacom.text.transform.Attribute._
+import org.mimacom.text.transform.Segment._
 
 
 /**
@@ -14,7 +15,7 @@ class TableParser(parser: CreoleWikiParser) {
   private val CUSTOMIZER_ALIGN = "align"
   private val CUSTOMIZER_NONFLOAT = "nonfloat"
 
-  private val table = Segment(TABLE)
+  private val table = TABLE()
   private var rows = 0
   private var columns = 0
   private var targetColumn = 0
@@ -48,7 +49,7 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def parseCell() {
-    cell = Segment(TABLE_CELL)
+    cell = TABLE_CELL()
     handleCellCustomizers()
     handleHeader()
     handleContent()
@@ -97,7 +98,7 @@ class TableParser(parser: CreoleWikiParser) {
       val options = parser.readUntil("\n").substring(1)
       val caption = handleTableCustomizers(options)
       if (caption.length > 0) {
-        table.add(CAPTION -> Segment.plainText(caption))
+        table.add(CAPTION -> plain(caption))
       }
     }
   }

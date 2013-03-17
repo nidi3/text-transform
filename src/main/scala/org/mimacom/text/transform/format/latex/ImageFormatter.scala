@@ -11,7 +11,7 @@ import org.mimacom.text.transform.format.latex.LatexFormatter.formatChildren
 object ImageFormatter {
   def format(context: Context, segment: Segment): String = {
     val image = segment(TARGET).get.asInstanceOf[String]
-    context.loadImage(segment, image) match {
+    context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)
       case Some(imageName) =>
         val name = formatChildren(context, segment)

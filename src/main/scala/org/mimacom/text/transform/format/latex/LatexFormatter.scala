@@ -1,14 +1,14 @@
 package org.mimacom.text.transform.format.latex
 
-import org.mimacom.text.transform.format.ImageLoader
+import org.mimacom.text.transform.format.ResourceLoader
 import org.mimacom.text.transform.{Formatter, Segment}
 import java.util.Locale
 import org.mimacom.text.transform.Attribute._
 import org.mimacom.text.transform.Name._
 import org.mimacom.text.transform.AttributeValue._
 
-class LatexFormatter(headingLevel: Int, locale: Locale, imageLoader: ImageLoader) extends Formatter {
-  val context = new Context(headingLevel, locale, imageLoader)
+class LatexFormatter(headingLevel: Int, locale: Locale, resourceLoader: ResourceLoader) extends Formatter {
+  val context = new Context(headingLevel, locale, resourceLoader)
 
   def format(segment: Segment) = {
     LatexFormatter.formatChildren(context, segment)
@@ -42,8 +42,8 @@ private[latex] object LatexFormatter {
   }
 
   val definitionFormatter = (context: Context, segment: Segment) => {
-    def formatChildren(context: Context, segment: Segment): String = {
-      segment.children.map(child => format(context, child)).mkString("\\\\")
+    def formatDefs(context: Context, segment: Segment): String = {
+      segment.children.map(child => formatChildren(context, child)).mkString("\\\\")
     }
 
     val width = segment(WIDTH) match {
@@ -51,7 +51,7 @@ private[latex] object LatexFormatter {
       case _ => "5cm"
     }
     val item = segment(TEXT).get.asInstanceOf[String]
-    val text = formatChildren(context, segment)
+    val text = formatDefs(context, segment)
     s"\\begin{description}[leftmargin=$width,style=sameline]\\item[$item]$text\\end{description}"
   }
 
@@ -76,7 +76,7 @@ private[latex] object LatexFormatter {
     TABLE -> TableFormatter.format _,
     LINE -> staticFormatter("\\\\ \\hline \\noindent \\\\") _,
     NEWLINE -> staticFormatter("\\\\") _,
-    LIST_ITEM -> cmdFormatter("item") _,
+    ITEM -> cmdFormatter("item") _,
     ITALICS -> cmdFormatter("textit") _,
     BOLD -> cmdFormatter("textbf") _,
     PLAIN -> PlainFormatter.format _,
