@@ -19,46 +19,36 @@ class TableFormatter(context: Context, segment: Segment) {
   def format: String = {
     val caption = segment(CAPTION).asInstanceOf[Option[Segment]]
     segment(FLOAT) match {
-      case Some(true) => transformFloatEnvironment(caption)
-      case _ => transformNonfloatEnvironment(caption)
+      case Some(true) => float(caption)
+      case _ => nonfloat(caption)
     }
   }
 
-  private def transformFloatEnvironment(caption: Option[Segment]) = {
+  private def caption(cmd: String, caption: Option[Segment]) = {
+    caption match {
+      case Some(seg) =>
+        val desc = LatexFormatter.format(context, seg)
+        s"\n\\$cmd{$desc} \\label{table:$desc}"
+      case _ => ""
+    }
+  }
+
+  private def float(cap: Option[Segment]) = {
     env("table") {
       "[hpt] \\centering\n" +
-        transformTable +
-        transformFloatCaption(caption)
+        table + caption("caption", cap)
     }
   }
 
-  private def transformFloatCaption(caption: Option[Segment]) = {
-    caption match {
-      case Some(seg) =>
-        val desc = LatexFormatter.format(context, seg)
-        s"\n\\caption{$desc} \\label{table:$desc}"
-      case _ => ""
-    }
-  }
-
-  private def transformNonfloatEnvironment(caption: Option[Segment]) = {
+  private def nonfloat(cap: Option[Segment]) = {
     env("center") {
-      transformTable + tranformNonfloatCaption(caption)
+      table + caption("captionof{table}", cap)
     }
   }
 
-  private def tranformNonfloatCaption(caption: Option[Segment]) = {
-    caption match {
-      case Some(seg) =>
-        val desc = LatexFormatter.format(context, seg)
-        s"\n\\captionof{table}{$desc} \\label{table:$desc}"
-      case _ => ""
-    }
-  }
-
-  private def transformTable = {
+  private def table = {
     env("tabular") {
-      s"{$columnsStyle}\n" + (1 to rows).map(row => transformRow(row)).mkString
+      s"{$columnsStyle}\n" + (1 to rows).map(row => doRow(row)).mkString
     }
   }
 
@@ -69,10 +59,10 @@ class TableFormatter(context: Context, segment: Segment) {
     }).mkString
   }
 
-  private def transformRow(row: Int) = {
+  private def doRow(row: Int) = {
     var currentCol = 1
 
-    def transformCell(cell: Segment) = {
+    def doCell(cell: Segment) = {
       val content =
         (cell(ALIGN) match {
           case Some(LEFT) => "\\raggedright "
@@ -97,16 +87,16 @@ class TableFormatter(context: Context, segment: Segment) {
             case Some(true) => header = true
             case _ =>
           }
-          s.append(transformCell(cell))
+          s.append(doCell(cell))
         case _ =>
       }
-      s.append(transformEndOfRow(currentCol == cols, header))
+      s.append(doEndOfRow(currentCol == cols, header))
       currentCol += 1
     }
     s
   }
 
-  private def transformEndOfRow(last: Boolean, header: Boolean) = {
+  private def doEndOfRow(last: Boolean, header: Boolean) = {
     if (last) {
       "\\tabularnewline " + (if (header) "\\hline" else "") + "\n"
     } else {

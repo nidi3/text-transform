@@ -56,17 +56,16 @@ object ImageFormatter {
   }
 
   private def transformFloatEnvironment(name: String, imageName: String, options: String) = {
+    val fig = transformFigure(imageName, options)
     env("figure") {
-      "[hpt]\n\\centering\n" +
-        transformFigure(imageName, options) +
-        s"\\caption{$name} \\label{image:$name}\n"
+      s"[hpt]\n\\centering\n$fig\\caption{$name} \\label{image:$name}\n"
     }
   }
 
   private def transformNonfloatEnvironment(name: String, imageName: String, options: String) = {
+    val fig = transformFigure(imageName, options)
     env("center") {
-      transformFigure(imageName, options) +
-        s"\\captionof{figure}{$name} \\label{image:$name}\n"
+      s"$fig\\captionof{figure}{$name} \\label{image:$name}\n"
     }
   }
 

@@ -23,7 +23,6 @@ object PlainFormatter {
 
   def format(context:Context,segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
 
-
   private def escaped(s: String): String = {
     val res = new StringBuilder
     var inDoubleQuotes = false

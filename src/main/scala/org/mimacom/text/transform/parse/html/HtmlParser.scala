@@ -31,8 +31,7 @@ class HtmlParser extends Parser {
     parse(xml, 1)(0)
   }
 
-  def nsDefs =
-    namespaces.map(ns => s"""xmlns:$ns="$ns" """).mkString
+  def nsDefs = namespaces.map(ns => s"""xmlns:$ns="$ns" """).mkString
 
   def namespaces: Seq[String] = Nil
 

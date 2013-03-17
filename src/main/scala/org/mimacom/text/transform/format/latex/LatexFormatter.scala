@@ -20,8 +20,10 @@ private[latex] object LatexFormatter {
 
   def staticFormatter(s: String)(context: Context, segment: Segment) = s
 
-  def cmdFormatter(name: String)(context: Context, segment: Segment) =
-    "\\%s{%s}".format(name, formatChildren(context, segment))
+  def cmdFormatter(name: String)(context: Context, segment: Segment) = {
+    val ch = formatChildren(context, segment)
+    s"\\$name{$ch}"
+  }
 
   val listFormatter = (context: Context, segment: Segment) =>
     env(if (segment(TYPE).get == UNORDERED) "itemize" else "enumerate") {
@@ -31,8 +33,8 @@ private[latex] object LatexFormatter {
   val linkFormatter = (context: Context, segment: Segment) => {
     val target = segment(TARGET).get.asInstanceOf[String]
     if (target.startsWith("http://") || target.startsWith("https://")) {
-      val fc = formatChildren(context, segment)
-      s"\\href{$target}{$fc}"
+      val ch = formatChildren(context, segment)
+      s"\\href{$target}{$ch}"
     } else if (target.startsWith("image:")) {
       val msg = context.message("image")
       s"$msg \\ref{$target}"
@@ -74,7 +76,7 @@ private[latex] object LatexFormatter {
     SYMBOL -> SymbolFormatter.format _,
     IMAGE -> ImageFormatter.format _,
     TABLE -> TableFormatter.format _,
-    LINE -> staticFormatter("\\\\ \\hline \\noindent \\\\") _,
+    LINE -> staticFormatter("""\\ \hline \noindent \\""") _,
     NEWLINE -> staticFormatter("\\\\") _,
     ITEM -> cmdFormatter("item") _,
     ITALICS -> cmdFormatter("textit") _,

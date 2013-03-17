@@ -6,14 +6,12 @@ import org.mimacom.text.transform.Attribute._
 
 class SimpleFormatter extends Formatter {
   def format(root: Segment) = {
-    val result = new StringBuilder()
-    root.children.foreach(segment => {
+    root.children.map(segment => {
       segment.name match {
-        case PLAIN => result.append(segment(TEXT).get)
-        case SYMBOL => result.append(segment(ORIGINAL).get)
-        case _ =>
+        case PLAIN => segment(TEXT).get
+        case SYMBOL => segment(ORIGINAL).get
+        case _ => ""
       }
-    })
-    result.toString()
+    }).mkString
   }
 }
