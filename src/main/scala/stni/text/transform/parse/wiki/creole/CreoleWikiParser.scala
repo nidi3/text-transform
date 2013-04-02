@@ -5,14 +5,18 @@ import stni.text.transform.AttributeValue._
 import stni.text.transform.Name._
 import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
+import stni.text.transform.Context
 import stni.text.transform.parse.wiki.{ListParser, AbstractWikiParser}
 
 /**
  *
  */
-class CreoleWikiParser extends AbstractWikiParser {
+class CreoleWikiParser(context:Context) extends AbstractWikiParser(context) {
   private val HTTP = "http:"
   private val HTTPS = "https:"
+  private val IMAGE_PREFIX = "image:"
+  private val DOCUMENT_PREFIX = "document:"
+
   private val MINUSES_FOR_LINE = 4
 
   private val CUSTOMIZER_WIDTH = "width"
@@ -54,7 +58,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       )
       while (currentChar == ':') {
         nextChar()
-        definition(ITEM(parseSub(readLine()): _*))
+        definition(ITEM(parseSub(readLine()).children: _*))
       }
       addToResult(definition)
     } else {
@@ -81,7 +85,7 @@ class CreoleWikiParser extends AbstractWikiParser {
       nextChar()
       val bold = readUntil("**")
       if (bold.length > 0) {
-        addToResult(BOLD(parseSub(bold): _*))
+        addToResult(BOLD(parseSub(bold).children: _*))
       }
     }
   }
@@ -97,7 +101,7 @@ class CreoleWikiParser extends AbstractWikiParser {
           nextChar()
           val italics = readUntil("//")
           if (italics.length > 0) {
-            addToResult(ITALICS(parseSub(italics): _*))
+            addToResult(ITALICS(parseSub(italics).children: _*))
           }
       }
     } else {
@@ -107,7 +111,13 @@ class CreoleWikiParser extends AbstractWikiParser {
 
   private def link() {
     readUntilClose('[', "]]").map(data => {
-      splitTarget(data, LINK(TYPE -> URL))
+      if (data.startsWith(IMAGE_PREFIX)) {
+        splitTarget(data.substring(IMAGE_PREFIX.length), LINK(TYPE -> IMAGE_REF))
+      } else if (data.startsWith(DOCUMENT_PREFIX)) {
+        splitTarget(data.substring(DOCUMENT_PREFIX.length), LINK(TYPE -> DOCUMENT_REF))
+      } else {
+        splitTarget(data, LINK(TYPE -> URL))
+      }
     })
   }
 
@@ -139,7 +149,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     val pos = data.indexOf('|')
     val target = data.substring(0, if (pos < 0) data.length else pos)
     val desc = data.substring(pos + 1)
-    segment(parseSub(desc): _*)(TARGET -> target)
+    segment(parseSub(desc).children: _*)(TARGET -> target)
     addToResult(segment)
   }
 
@@ -160,7 +170,7 @@ class CreoleWikiParser extends AbstractWikiParser {
     if (!text.isEmptyOrNewline) {
       text.append('=')
     } else {
-      val level = getCount('=') + initLevel
+      val level = getCount('=') + initLevel + context.headingLevel
       val heading = readUntil("=" * level, "\n")
       skipWhitspaces()
       if (heading.length > 0) {

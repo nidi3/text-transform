@@ -5,13 +5,15 @@ import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 import stni.text.transform.parse.ParserTest
+import stni.text.transform.Context
+import java.util.Locale
 
 
 /**
  *
  */
 class HtmlParserTest extends ParserTest {
-  val parser = new HtmlParser
+  val parser = new HtmlParser(new Context(0, Locale.GERMAN, null))
 
   "simple strings" should "be untouched" in {
     "" parseTo ROOT()

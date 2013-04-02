@@ -1,15 +1,12 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.format.ResourceLoader
-import stni.text.transform.{Formatter, Segment}
+import stni.text.transform.{Context, ResourceLoader, Formatter, Segment}
 import java.util.Locale
 import stni.text.transform.Attribute._
 import stni.text.transform.Name._
 import stni.text.transform.AttributeValue._
 
-class LatexFormatter(headingLevel: Int, locale: Locale, resourceLoader: ResourceLoader) extends Formatter {
-  val context = new Context(headingLevel, locale, resourceLoader)
-
+class LatexFormatter(val context:Context) extends Formatter {
   def format(segment: Segment) = {
     LatexFormatter.formatChildren(context, segment)
   }
@@ -29,19 +26,6 @@ private[latex] object LatexFormatter {
     env(if (segment(TYPE).get == UNORDERED) "itemize" else "enumerate") {
       formatChildren(context, segment)
     }
-
-  val linkFormatter = (context: Context, segment: Segment) => {
-    val target = segment(TARGET).get.asInstanceOf[String]
-    if (target.startsWith("http://") || target.startsWith("https://")) {
-      val ch = formatChildren(context, segment)
-      s"\\href{$target}{$ch}"
-    } else if (target.startsWith("image:")) {
-      val msg = context.message("image")
-      s"$msg \\ref{$target}"
-    } else {
-      s"\\ref{$target}"
-    }
-  }
 
   val definitionFormatter = (context: Context, segment: Segment) => {
     def formatDefs(context: Context, segment: Segment): String = {
@@ -71,12 +55,12 @@ private[latex] object LatexFormatter {
 
   val formatters = Map(
     LIST -> listFormatter,
-    LINK -> linkFormatter,
+    LINK -> LinkFormatter.format _,
     HEADING -> headingFormatter,
     SYMBOL -> SymbolFormatter.format _,
     IMAGE -> ImageFormatter.format _,
     TABLE -> TableFormatter.format _,
-    LINE -> staticFormatter("""\\ \hline \noindent \\""") _,
+    LINE -> staticFormatter( """\\ \hline \noindent \\""") _,
     NEWLINE -> staticFormatter("\\\\") _,
     ITEM -> cmdFormatter("item") _,
     ITALICS -> cmdFormatter("textit") _,

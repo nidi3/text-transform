@@ -1,12 +1,13 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.format.{FormatterTest, ResourceLoader}
-import stni.text.transform.{Attribute, AttributeValue, Segment}
+import stni.text.transform.format.FormatterTest
+import stni.text.transform._
 import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Name._
 import java.util.Locale
+import scala.Some
 
 
 /**
@@ -17,7 +18,7 @@ class LatexFormatterTest extends FormatterTest {
     def loadResource(source: Segment, name: String) = if (name == "nix") None else Some("load:" + name)
   }
 
-  val formatter = new LatexFormatter(2, Locale.GERMAN, resourceLoader)
+  val formatter = new LatexFormatter(new Context(2, Locale.GERMAN, resourceLoader))
 
   behavior of "basic formatting"
 
@@ -80,14 +81,14 @@ class LatexFormatterTest extends FormatterTest {
   it should "translate external link into href and support nested format" in {
     "a\\href{http://}{d1\\textbf{d2}}b" formatOf ROOT(
       plain("a"),
-      LINK(TARGET -> "http://", plain("d1"), BOLD(plain("d2"))),
+      LINK(TARGET -> "http://", TYPE -> URL, plain("d1"), BOLD(plain("d2"))),
       plain("b"))
   }
 
   it should "translate link to image into ref with 'Abbildung'" in {
     "aAbbildung \\ref{image:img}b" formatOf ROOT(
       plain("a"),
-      LINK(TARGET -> "image:img", plain("d1"), BOLD(plain("d2"))),
+      LINK(TARGET -> "img", TYPE -> IMAGE_REF, plain("d1"), BOLD(plain("d2"))),
       plain("b"))
   }
 
@@ -96,6 +97,13 @@ class LatexFormatterTest extends FormatterTest {
       plain("a"),
       LINK(TARGET -> "other", plain("d1"), BOLD(plain("d2"))),
       plain("b"))
+  }
+
+  it should "support links to other documents" in {
+    "starta\\textbf{b}eee" formatOf ROOT(
+      plain("start"),
+      LINK(TYPE -> DOCUMENT_REF, TARGET -> "sub", SUB -> ROOT(plain("a"), BOLD(plain("b")))),
+      plain("eee"))
   }
 
   behavior of "heading"

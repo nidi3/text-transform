@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Attribute, Segment}
+import stni.text.transform.{Context, Attribute, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.format.latex.LatexFormatter.env

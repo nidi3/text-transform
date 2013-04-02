@@ -1,8 +1,8 @@
 package stni.text.transform.parse.wiki
 
 
-import stni.text.transform.parse.{TextAccumulator, AbstractParser}
-import stni.text.transform.Segment
+import stni.text.transform.parse.{TextAccumulator, AbstractCharReadingParser}
+import stni.text.transform.Context
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 
@@ -10,7 +10,7 @@ import stni.text.transform.Segment._
 /**
  *
  */
-abstract class AbstractWikiParser extends AbstractParser {
+abstract class AbstractWikiParser(context: Context) extends AbstractCharReadingParser(context) {
   val HTTP_SLASH = "http://"
   val HTTPS_SLASH = "https://"
 
@@ -20,7 +20,7 @@ abstract class AbstractWikiParser extends AbstractParser {
   protected def handleSpecialChar()
 
   override def doParse() {
-    while (currentChar != AbstractParser.EOI) {
+    while (currentChar != AbstractCharReadingParser.EOI) {
       val resultsBefore = result.size
       handleSpecialChar()
       if (resultsBefore != result.size) {
@@ -74,7 +74,7 @@ abstract class AbstractWikiParser extends AbstractParser {
     }
   }
 
-  private def arrowLeft(){
+  private def arrowLeft() {
     nextChar() match {
       case '-' =>
         if (nextChar() != '-') {

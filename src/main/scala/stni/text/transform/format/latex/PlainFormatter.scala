@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.Segment
+import stni.text.transform.{Context, Segment}
 import stni.text.transform.Attribute._
 
 /**

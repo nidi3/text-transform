@@ -6,13 +6,15 @@ import stni.text.transform.Attribute._
 import stni.text.transform.Segment._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.parse.ParserTest
+import stni.text.transform.Context
+import java.util.Locale
 
 
 /**
  *
  */
 class CreoleWikiParserTest extends ParserTest {
-  val parser = new CreoleWikiParser
+  val parser = new CreoleWikiParser(new Context(0, Locale.GERMAN, null))
 
   "simple strings" should "be untouched" in {
     "" parseTo ROOT()
@@ -113,6 +115,14 @@ class CreoleWikiParserTest extends ParserTest {
 
   it should "accept formats inside description" in {
     "[[link|desc**bold**]]" parseTo LINK(TYPE -> URL, TARGET -> "link", plain("desc"), BOLD(plain("bold")))
+  }
+
+  it should "treat links starting with 'image:' specially" in {
+    "[[image:xxx]]" parseTo LINK(TYPE -> IMAGE_REF, TARGET -> "xxx", plain("xxx"))
+  }
+
+  it should "treat links starting with 'document:' specially" in {
+    "[[document:xxx]]" parseTo LINK(TYPE -> DOCUMENT_REF, TARGET -> "xxx", plain("xxx"))
   }
 
   it should "also be found in plaintext 'http://'" in {

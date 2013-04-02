@@ -16,7 +16,8 @@ object AttributeValue {
   val DOUBLE_ARROW_BOTH = new AttributeValue("dbarr")
   val LEFT = new AttributeValue("left")
   val RIGHT = new AttributeValue("right")
-  val FILE = new AttributeValue("file")
-  val DOCUMENT = new AttributeValue("document")
+  val FILE_REF = new AttributeValue("file")
+  val DOCUMENT_REF = new AttributeValue("document")
+  val IMAGE_REF = new AttributeValue("image")
   val URL = new AttributeValue("url")
 }

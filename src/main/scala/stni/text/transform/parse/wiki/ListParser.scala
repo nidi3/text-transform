@@ -3,7 +3,7 @@ package stni.text.transform.parse.wiki
 import stni.text.transform.{Segment, AttributeValue}
 import stni.text.transform.Attribute._
 import stni.text.transform.Name._
-import stni.text.transform.parse.AbstractParser.EOI
+import stni.text.transform.parse.AbstractCharReadingParser.EOI
 
 
 /**
@@ -70,7 +70,7 @@ class ListParser(parser: AbstractWikiParser,listState:ListState, listType: Attri
     while (!parser.isCurrentCharOneOf("#*\n" + EOI)) {
       content.append("\n").append(parser.readUntil("\n"))
     }
-    listState.currentList(ITEM(parser.parseSub(content.toString()): _*))
+    listState.currentList(ITEM(parser.parseSub(content.toString()).children: _*))
   }
 
   private def handleNewlines() {

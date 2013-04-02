@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{AttributeValue, Segment}
+import stni.text.transform.{Context, AttributeValue, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import scala.Some

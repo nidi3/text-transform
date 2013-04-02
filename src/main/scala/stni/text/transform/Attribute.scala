@@ -25,6 +25,7 @@ object Attribute {
   val ALIGN = Attribute("align")
   val HEADER = Attribute("header")
   val CAPTION = Attribute("caption")
+  val SUB = Attribute("sub")
 
   def apply(name: String) = new Attribute(name)
 }
