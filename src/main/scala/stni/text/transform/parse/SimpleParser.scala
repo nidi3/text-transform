@@ -1,12 +1,12 @@
 package stni.text.transform.parse
 
 import stni.text.transform.Segment._
-import stni.text.transform.Context
+import stni.text.transform.TransformContext
 
 /**
  *
  */
-class SimpleParser(context: Context) extends AbstractCharReadingParser(context) {
+class SimpleParser(context: TransformContext) extends AbstractCharReadingParser(context) {
   def doParse() {
     addToResult(plain(input))
   }

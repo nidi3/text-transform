@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, Segment}
+import stni.text.transform.{TransformContext, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 
@@ -8,7 +8,7 @@ import stni.text.transform.AttributeValue._
  *
  */
 object LinkFormatter {
-  def format(context: Context, segment: Segment) = {
+  def format(context: TransformContext, segment: Segment) = {
     val target = segment(TARGET).get.asInstanceOf[String]
 
     def link() = {

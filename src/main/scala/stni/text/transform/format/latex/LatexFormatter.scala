@@ -1,12 +1,12 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, ResourceLoader, Formatter, Segment}
+import stni.text.transform.{TransformContext, ResourceLoader, Formatter, Segment}
 import java.util.Locale
 import stni.text.transform.Attribute._
 import stni.text.transform.Name._
 import stni.text.transform.AttributeValue._
 
-class LatexFormatter(val context:Context) extends Formatter {
+class LatexFormatter(val context:TransformContext) extends Formatter {
   def format(segment: Segment) = {
     LatexFormatter.formatChildren(context, segment)
   }
@@ -15,20 +15,20 @@ class LatexFormatter(val context:Context) extends Formatter {
 private[latex] object LatexFormatter {
   def env(name: String)(block: => String) = s"\\begin{$name}$block\\end{$name}"
 
-  def staticFormatter(s: String)(context: Context, segment: Segment) = s
+  def staticFormatter(s: String)(context: TransformContext, segment: Segment) = s
 
-  def cmdFormatter(name: String)(context: Context, segment: Segment) = {
+  def cmdFormatter(name: String)(context: TransformContext, segment: Segment) = {
     val ch = formatChildren(context, segment)
     s"\\$name{$ch}"
   }
 
-  val listFormatter = (context: Context, segment: Segment) =>
+  val listFormatter = (context: TransformContext, segment: Segment) =>
     env(if (segment(TYPE).get == UNORDERED) "itemize" else "enumerate") {
       formatChildren(context, segment)
     }
 
-  val definitionFormatter = (context: Context, segment: Segment) => {
-    def formatDefs(context: Context, segment: Segment): String = {
+  val definitionFormatter = (context: TransformContext, segment: Segment) => {
+    def formatDefs(context: TransformContext, segment: Segment): String = {
       segment.children.map(child => formatChildren(context, child)).mkString("\\\\")
     }
 
@@ -41,7 +41,7 @@ private[latex] object LatexFormatter {
     s"\\begin{description}[leftmargin=$width,style=sameline]\\item[$item]$text\\end{description}"
   }
 
-  val headingFormatter = (context: Context, segment: Segment) => {
+  val headingFormatter = (context: TransformContext, segment: Segment) => {
     val headings = List(
       "chapter", "section", "subsection", "subsubsection", "paragraph", "subparagraph"
     )
@@ -51,7 +51,7 @@ private[latex] object LatexFormatter {
     cmdFormatter(heading)(context, segment)
   }
 
-  val defaultFormatter = (context: Context, segment: Segment) => ""
+  val defaultFormatter = (context: TransformContext, segment: Segment) => ""
 
   val formatters = Map(
     LIST -> listFormatter,
@@ -69,10 +69,10 @@ private[latex] object LatexFormatter {
     DEFINITION -> definitionFormatter
   )
 
-  def format(context: Context, segment: Segment): String =
+  def format(context: TransformContext, segment: Segment): String =
     formatters.getOrElse(segment.name, defaultFormatter)(context, segment)
 
-  def formatChildren(context: Context, segment: Segment): String =
+  def formatChildren(context: TransformContext, segment: Segment): String =
     segment.children.map(child => format(context, child)).mkString
 }
 

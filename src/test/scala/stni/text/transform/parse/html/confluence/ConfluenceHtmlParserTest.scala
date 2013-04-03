@@ -5,7 +5,7 @@ import stni.text.transform.Attribute._
 import stni.text.transform.Segment._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.parse.ParserTest
-import stni.text.transform.{Context, Segment, ResourceLoader}
+import stni.text.transform.{TransformContext, Segment, ResourceLoader}
 import java.util.Locale
 
 
@@ -13,7 +13,7 @@ import java.util.Locale
  *
  */
 class ConfluenceHtmlParserTest extends ParserTest {
-  val parser = new ConfluenceHtmlParser(new Context(0, Locale.GERMAN, new ResourceLoader {
+  val parser = new ConfluenceHtmlParser(new TransformContext(0, Locale.GERMAN, new ResourceLoader {
     def loadResource(source: Segment, name: String): Option[String] = Some("<strong>" + name + "</strong>")
   }))
 

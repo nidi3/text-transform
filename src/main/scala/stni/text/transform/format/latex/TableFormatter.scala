@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, Attribute, Segment}
+import stni.text.transform.{TransformContext, Attribute, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.format.latex.LatexFormatter.env
@@ -9,10 +9,10 @@ import stni.text.transform.format.latex.LatexFormatter.env
  * Formats a table element.
  */
 object TableFormatter {
-  def format(context: Context, segment: Segment) = new TableFormatter(context, segment).format
+  def format(context: TransformContext, segment: Segment) = new TableFormatter(context, segment).format
 }
 
-class TableFormatter(context: Context, segment: Segment) {
+class TableFormatter(context: TransformContext, segment: Segment) {
   val rows = segment(ROWS).get.asInstanceOf[Int]
   val cols = segment(COLUMNS).get.asInstanceOf[Int]
 
@@ -47,16 +47,21 @@ class TableFormatter(context: Context, segment: Segment) {
   }
 
   private def table = {
-    env("tabular") {
+    env("longtable") {
       s"{$columnsStyle}\n" + (1 to rows).map(row => doRow(row)).mkString
     }
   }
 
   private def columnsStyle = {
-    (1 to cols).map(col => segment(WIDTH(col)) match {
-      case Some(width) => "p{" + width + "} "
-      case _ => "l "
-    }).mkString
+    val noWidth = (1 to cols).forall(col => segment(WIDTH(col)).isEmpty)
+    if (noWidth) {
+      ("p{" + (.9 / cols) + " \\textwidth} ") * cols
+    } else {
+      (1 to cols).map(col => segment(WIDTH(col)) match {
+        case Some(width) => "p{" + width + "} "
+        case _ => "l "
+      }).mkString
+    }
   }
 
   private def doRow(row: Int) = {
@@ -98,7 +103,7 @@ class TableFormatter(context: Context, segment: Segment) {
 
   private def doEndOfRow(last: Boolean, header: Boolean) = {
     if (last) {
-      "\\tabularnewline " + (if (header) "\\hline" else "") + "\n"
+      "\\tabularnewline " + (if (header) "\\hline \\endhead" else "") + "\n"
     } else {
       "&"
     }

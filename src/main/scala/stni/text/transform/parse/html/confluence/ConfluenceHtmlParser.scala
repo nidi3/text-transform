@@ -7,12 +7,12 @@ import stni.text.transform.Name._
 import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
-import stni.text.transform.Context
+import stni.text.transform.TransformContext
 
 /**
  *
  */
-class ConfluenceHtmlParser(context: Context) extends HtmlParser(context) {
+class ConfluenceHtmlParser(context: TransformContext) extends HtmlParser(context) {
   override def namespaces = List("ac", "ri")
 
   override def parse(node: Node, listLevel: Int): Seq[Segment] = {
@@ -32,13 +32,18 @@ class ConfluenceHtmlParser(context: Context) extends HtmlParser(context) {
         if (link.children.isEmpty) link(plain(file))
       case n@ <ri:page>{ns@_*}</ri:page> =>
         val target = attr(n, "ri:space-key") + ":" + attr(n, "ri:content-title")
-        context.loadResource(link, target).map(content => link(SUB -> parseSub(content, context.sub)))
         link(TYPE -> DOCUMENT_REF, TARGET -> target)
+        context.loadResource(link, target).map(content => link(SUB -> context.includeSub(link, parseSub(content, context.subContext))))
       case n@ <ac:plain-text-link-body>{ns@_*}</ac:plain-text-link-body> =>
         link.children.clear()
         link(plain(ns(0).text))
+      //TODO anchor!
+      //case n@ <ac:anchor>{ns@_*}</ac:anchor> => link(TARGET->"")
       case _ =>
     }
+    //TODO quick fix!
+    if (link(TARGET).isEmpty)
+      link(TARGET -> "")
     List(link)
   }
 

@@ -41,6 +41,24 @@ class Segment(val name: Name) extends PseudoSegment {
     this
   }
 
+  def prepend(child: Segment): Segment = {
+    child._parent = Some(this)
+    child +=: children
+    this
+  }
+
+  def removeAll(p: Segment => Boolean): Segment = {
+    var i = 0
+    while (i < children.length) {
+      if (p(children(i))) {
+        children.insert(i, children.remove(i).removeAll(p).children: _*)
+      } else {
+        i += 1
+      }
+    }
+    this
+  }
+
   def addAttribute(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
 
   def addChild(child: Segment): Segment = add(child)

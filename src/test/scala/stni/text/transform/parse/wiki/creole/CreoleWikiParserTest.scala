@@ -6,7 +6,7 @@ import stni.text.transform.Attribute._
 import stni.text.transform.Segment._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.parse.ParserTest
-import stni.text.transform.Context
+import stni.text.transform.TransformContext
 import java.util.Locale
 
 
@@ -14,7 +14,7 @@ import java.util.Locale
  *
  */
 class CreoleWikiParserTest extends ParserTest {
-  val parser = new CreoleWikiParser(new Context(0, Locale.GERMAN, null))
+  val parser = new CreoleWikiParser(new TransformContext(0, Locale.GERMAN, null))
 
   "simple strings" should "be untouched" in {
     "" parseTo ROOT()

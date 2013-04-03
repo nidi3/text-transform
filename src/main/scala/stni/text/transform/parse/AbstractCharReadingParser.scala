@@ -1,7 +1,7 @@
 package stni.text.transform.parse
 
 import collection.mutable.ListBuffer
-import stni.text.transform.{Context, Parser, Segment}
+import stni.text.transform.{TransformContext, Parser, Segment}
 import stni.text.transform.Name._
 import AbstractCharReadingParser.EOI
 
@@ -12,7 +12,7 @@ object AbstractCharReadingParser {
   val EOI: Char = -1.asInstanceOf[Char]
 }
 
-abstract class AbstractCharReadingParser(context:Context) extends AbstractParser(context) {
+abstract class AbstractCharReadingParser(context:TransformContext) extends AbstractParser(context) {
 
   private var c: Char = 0
   private var pos: Int = 0

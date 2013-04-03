@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, Segment}
+import stni.text.transform.{TransformContext, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.format.latex.LatexFormatter.env
 import stni.text.transform.format.latex.LatexFormatter.formatChildren
@@ -9,7 +9,7 @@ import stni.text.transform.format.latex.LatexFormatter.formatChildren
  * Formats an image element.
  */
 object ImageFormatter {
-  def format(context: Context, segment: Segment): String = {
+  def format(context: TransformContext, segment: Segment): String = {
     val image = segment(TARGET).get.asInstanceOf[String]
     context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)

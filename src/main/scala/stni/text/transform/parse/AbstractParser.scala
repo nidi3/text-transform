@@ -1,11 +1,11 @@
 package stni.text.transform.parse
 
-import stni.text.transform.{Context, Segment, Parser}
+import stni.text.transform.{TransformContext, Segment, Parser}
 
 /**
  *
  */
-abstract class AbstractParser(val context: Context) extends Parser {
+abstract class AbstractParser(val context: TransformContext) extends Parser {
 
   private var _input: String = ""
 
@@ -16,11 +16,11 @@ abstract class AbstractParser(val context: Context) extends Parser {
 
   def parseImpl(): Segment
 
-  def parseSub(sub: String, subContext: Context = context): Segment = newInstance(subContext).parse(sub)
+  def parseSub(sub: String, subContext: TransformContext = context): Segment = newInstance(subContext).parse(sub)
 
-  protected def newInstance(subContext: Context = context): AbstractParser = {
+  protected def newInstance(subContext: TransformContext = context): AbstractParser = {
     try {
-      getClass.getConstructor(classOf[Context]).newInstance(subContext)
+      getClass.getConstructor(classOf[TransformContext]).newInstance(subContext)
     } catch {
       case e: Exception => throw new RuntimeException("Could not create a new instance of " + getClass, e)
     }

@@ -5,7 +5,7 @@ import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 import stni.text.transform.parse.ParserTest
-import stni.text.transform.Context
+import stni.text.transform.{Attribute, TransformContext}
 import java.util.Locale
 
 
@@ -13,7 +13,7 @@ import java.util.Locale
  *
  */
 class HtmlParserTest extends ParserTest {
-  val parser = new HtmlParser(new Context(0, Locale.GERMAN, null))
+  val parser = new HtmlParser(new TransformContext(0, Locale.GERMAN, null))
 
   "simple strings" should "be untouched" in {
     "" parseTo ROOT()
@@ -175,15 +175,19 @@ class HtmlParserTest extends ParserTest {
       plain("next"))
   }
 
-  behavior of "|"
+  behavior of "<table>"
 
-  //  it should "parse as table" in {
-  //    "a|b" parseTo  ROOT(
-  //      assert(1 === list.size)
-  //        assertSegmentEquals(PLAIN, "a|b", list, 0)
-  //  }
-  //
-  //  it should "accept headings, formats inside, a caption" in {
+  it should "parse as table" in {
+    "<table><tbody><tr><th>h1</th><th>h2</th></tr><tr><td>c1</td><td>c2</td></tr></tbody></table>" parseTo TABLE(
+      COLUMNS -> 2, ROWS -> 2,
+      Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
+      Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")),
+      Attribute("2,1") -> TABLE_CELL(plain("c1")),
+      Attribute("2,2") -> TABLE_CELL(plain("c2")))
+  }
+
+
+  //it should "accept headings, formats inside, a caption" in {
   //    "|=h1|=h2|\n   |a|b| \n |c \n |**d**e|f|g \n!<nonfloat>This table show interesting \"data\"\nnext" parseTo  ROOT(
   //      assert(2 === list.size)
   //        assertSegmentEquals(TABLE, null, list, 0)

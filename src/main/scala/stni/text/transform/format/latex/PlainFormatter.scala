@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, Segment}
+import stni.text.transform.{TransformContext, Segment}
 import stni.text.transform.Attribute._
 
 /**
@@ -21,7 +21,7 @@ object PlainFormatter {
     '[' -> "{[}",
     ']' -> "{]}")
 
-  def format(context:Context,segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
+  def format(context:TransformContext,segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
 
   private def escaped(s: String): String = {
     val res = new StringBuilder

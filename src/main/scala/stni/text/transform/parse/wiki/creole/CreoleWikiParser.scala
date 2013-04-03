@@ -5,13 +5,13 @@ import stni.text.transform.AttributeValue._
 import stni.text.transform.Name._
 import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
-import stni.text.transform.Context
+import stni.text.transform.TransformContext
 import stni.text.transform.parse.wiki.{ListParser, AbstractWikiParser}
 
 /**
  *
  */
-class CreoleWikiParser(context:Context) extends AbstractWikiParser(context) {
+class CreoleWikiParser(context:TransformContext) extends AbstractWikiParser(context) {
   private val HTTP = "http:"
   private val HTTPS = "https:"
   private val IMAGE_PREFIX = "image:"

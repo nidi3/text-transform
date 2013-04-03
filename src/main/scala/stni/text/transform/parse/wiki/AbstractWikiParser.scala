@@ -2,7 +2,7 @@ package stni.text.transform.parse.wiki
 
 
 import stni.text.transform.parse.{TextAccumulator, AbstractCharReadingParser}
-import stni.text.transform.Context
+import stni.text.transform.TransformContext
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 
@@ -10,7 +10,7 @@ import stni.text.transform.Segment._
 /**
  *
  */
-abstract class AbstractWikiParser(context: Context) extends AbstractCharReadingParser(context) {
+abstract class AbstractWikiParser(context: TransformContext) extends AbstractCharReadingParser(context) {
   val HTTP_SLASH = "http://"
   val HTTPS_SLASH = "https://"
 

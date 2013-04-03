@@ -1,6 +1,6 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{Context, AttributeValue, Segment}
+import stni.text.transform.{TransformContext, AttributeValue, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import scala.Some
@@ -19,7 +19,7 @@ object SymbolFormatter {
     DOUBLE_ARROW_BOTH -> "$\\Leftrightarrow$ "
   )
 
-  def format(context: Context, segment: Segment) =
+  def format(context: TransformContext, segment: Segment) =
     symbols.get(segment(TYPE).get.asInstanceOf[AttributeValue]) match {
       case None => segment(ORIGINAL).get.asInstanceOf[String]
       case Some(s) => s

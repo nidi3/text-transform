@@ -18,7 +18,7 @@ class LatexFormatterTest extends FormatterTest {
     def loadResource(source: Segment, name: String) = if (name == "nix") None else Some("load:" + name)
   }
 
-  val formatter = new LatexFormatter(new Context(2, Locale.GERMAN, resourceLoader))
+  val formatter = new LatexFormatter(new TransformContext(2, Locale.GERMAN, resourceLoader))
 
   behavior of "basic formatting"
 
