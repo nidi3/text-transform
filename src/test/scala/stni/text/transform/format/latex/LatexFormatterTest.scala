@@ -63,14 +63,14 @@ class LatexFormatterTest extends FormatterTest {
   behavior of "list"
 
   it should "translate unordered list into an itemize environment" in {
-    "\\begin{itemize}\\item{a}\\item{b}\\end{itemize}" formatOf LIST(
+    "\\begin{itemize} \\item{a}\\item{b}\\end{itemize}" formatOf LIST(
       TYPE -> UNORDERED,
       ITEM(plain("a")),
       ITEM(plain("b")))
   }
 
   it should "translate unordered list into an enumerate environment" in {
-    "\\begin{enumerate}\\item{a}\\item{b}\\end{enumerate}" formatOf LIST(
+    "\\begin{enumerate} \\item{a}\\item{b}\\end{enumerate}" formatOf LIST(
       TYPE -> ORDERED,
       ITEM(plain("a")),
       ITEM(plain("b")))
@@ -99,10 +99,17 @@ class LatexFormatterTest extends FormatterTest {
       plain("b"))
   }
 
-  it should "support links to other documents" in {
+  it should "support reference links to other documents" in {
     "starta\\textbf{b}eee" formatOf ROOT(
       plain("start"),
       LINK(TYPE -> DOCUMENT_REF, TARGET -> "sub", SUB -> ROOT(plain("a"), BOLD(plain("b")))),
+      plain("eee"))
+  }
+
+  it should "support include links to other documents" in {
+    "starta\\textbf{b}eee" formatOf ROOT(
+      plain("start"),
+      LINK(TYPE -> DOCUMENT_INCLUDE, TARGET -> "sub", plain("a"), BOLD(plain("b"))),
       plain("eee"))
   }
 
@@ -135,7 +142,7 @@ class LatexFormatterTest extends FormatterTest {
 
   behavior of "image"
 
-  val start = "\\begin{figure}[hpt]\n\\centering\n\\includegraphics["
+  val start = "\\begin{figure}[hpt] \\centering\n\\includegraphics["
   val end = "]{load:target}\n\\caption{bild} \\label{image:bild}\n\\end{figure}"
   val image = IMAGE(TARGET -> "target", FLOAT -> true, plain("bild"))
 
@@ -161,8 +168,8 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "make use of captionof if not floating" in {
-    val start = "\\begin{center}\\includegraphics["
-    val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{center}"
+    val start = "\\begin{center} \\begin{minipage}{\\linewidth} \\includegraphics["
+    val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{minipage}\\end{center}"
     val image = IMAGE(TARGET -> "target", FLOAT -> false, plain("bild"))
     start + "width=1.0\\textwidth" + end formatOf image
   }
@@ -170,34 +177,34 @@ class LatexFormatterTest extends FormatterTest {
   behavior of "table"
 
   val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> true, Attribute("1,1") -> TABLE_CELL(plain("a1")))
-  val prefix = "\\begin{table}[hpt] \\centering\n\\begin{tabular}"
-  val postfix = "\\end{tabular}\\end{table}"
+  val prefix = "\\begin{table}[hpt] \\centering\n\\begin{longtable}"
+  val postfix = "\\end{longtable}\\end{table}"
 
   it should "translate into a tabular environment wrapped into a table environment if floating" in {
-    prefix + "{l l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "a1&\\tabularnewline \n" + postfix formatOf table
   }
 
   it should "understand width attribute" in {
-    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table(WIDTH(1) -> "5cm")
+    prefix + "{p{5cm} l } " + "a1&\\tabularnewline \n" + postfix formatOf table(WIDTH(1) -> "5cm")
   }
 
   it should "underline the header" in {
-    prefix + "{p{5cm} l }\n" + "a1&\\tabularnewline \\hline\n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "a1&\\tabularnewline \\hline \\endhead\n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("a1")))
   }
 
   it should "translate align left into raggedright" in {
-    prefix + "{p{5cm} l }\n" + "\\raggedright a1&\\tabularnewline \n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\raggedright a1&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> LEFT, plain("a1")))
   }
 
   it should "translate align right into reggedleft" in {
-    prefix + "{p{5cm} l }\n" + "\\raggedleft a1&\\tabularnewline \n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\raggedleft a1&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> RIGHT, plain("a1")))
   }
 
   it should "translate span into multicolumn" in {
-    prefix + "{p{5cm} l }\n" + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a1")))
   }
 
@@ -205,11 +212,11 @@ class LatexFormatterTest extends FormatterTest {
     val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> false,
       CAPTION -> plain("new table \"here\""),
       Attribute("1,1") -> TABLE_CELL(plain("a1")))
-    val prefix = "\\begin{center}\\begin{tabular}"
-    val postfix = "\\end{tabular}\n" +
+    val prefix = "\\begin{center} \\begin{longtable}"
+    val postfix = "\\end{longtable}\n" +
       "\\captionof{table}{new table \"`here\"'} \\label{table:new table \"`here\"'}" +
       "\\end{center}"
 
-    prefix + "{l l }\n" + "a1&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "a1&\\tabularnewline \n" + postfix formatOf table
   }
 }

@@ -63,6 +63,19 @@ class Segment(val name: Name) extends PseudoSegment {
 
   def addChild(child: Segment): Segment = add(child)
 
+  def inherited(name: Attribute): Option[Any] = {
+    this(name) match {
+      case Some(value) => Some(value)
+      case _ => if (parent.isEmpty) None else parent.get.inherited(name)
+    }
+  }
+
+  def findParent(name: Name): Option[Segment] = {
+    if (this.name == name) Some(this)
+    else if (parent.isEmpty) None
+    else parent.get.findParent(name)
+  }
+
   def root: Segment = {
     parent match {
       case Some(seg) => seg.root

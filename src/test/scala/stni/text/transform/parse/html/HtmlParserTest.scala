@@ -186,6 +186,15 @@ class HtmlParserTest extends ParserTest {
       Attribute("2,2") -> TABLE_CELL(plain("c2")))
   }
 
+  it should "interpet <td class='highlight'> as <th>" in {
+    "<table><tbody><tr><td class='highlight'>h1</td><th>h2</th></tr><tr><td>c1</td><td>c2</td></tr></tbody></table>" parseTo TABLE(
+      COLUMNS -> 2, ROWS -> 2,
+      Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
+      Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")),
+      Attribute("2,1") -> TABLE_CELL(plain("c1")),
+      Attribute("2,2") -> TABLE_CELL(plain("c2")))
+  }
+
 
   //it should "accept headings, formats inside, a caption" in {
   //    "|=h1|=h2|\n   |a|b| \n |c \n |**d**e|f|g \n!<nonfloat>This table show interesting \"data\"\nnext" parseTo  ROOT(
@@ -275,5 +284,20 @@ class HtmlParserTest extends ParserTest {
 
   it should "be parsed as plain text" in {
     "**hhh" parseTo BOLD(plain("hhh"))
+  }
+
+  behavior of "cleanNewlines"
+
+  it should "clean up NEWLINES before/after HEADINGS, TABLES, LISTS" in {
+    "a<br/><br/><h1>head</h1><br/><br/>b" parseTo ROOT(plain("a"), HEADING(LEVEL -> 1, plain("head")), plain("b"))
+    "<strong>a<br/><br/><h1>head</h1><br/><br/>b</strong>" parseTo ROOT(BOLD(plain("a"), HEADING(LEVEL -> 1, plain("head")), plain("b")))
+    "a<br/><br/><table></table><br/><br/>b" parseTo ROOT(plain("a"), TABLE(COLUMNS -> 0, ROWS -> 0), plain("b"))
+    "a<br/><br/><ul><li></li></ul><br/><br/>b" parseTo ROOT(plain("a"), LIST(LEVEL -> 1, TYPE -> UNORDERED), plain("b"))
+  }
+
+  it should "clean up NEWLINES at start and end" in {
+    "<br/><br/>a" parseTo plain("a")
+    "a<br/><br/>" parseTo plain("a")
+    "<br/><br/>a<br/><br/>" parseTo ROOT(plain("a"))
   }
 }

@@ -3,7 +3,9 @@ package stni.text.transform.parse.wiki.creole
 import stni.text.transform.{Attribute, Segment}
 import stni.text.transform.Name._
 import stni.text.transform.Attribute._
+import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
+import stni.text.transform.parse.CustomizerParser
 
 
 /**
@@ -12,6 +14,7 @@ import stni.text.transform.Segment._
 class TableParser(parser: CreoleWikiParser) {
   private val CUSTOMIZER_COLSPAN = "colspan"
   private val CUSTOMIZER_WIDTH = "width"
+  private val CUSTOMIZER_ALIGN_CELL = "align-cell"
   private val CUSTOMIZER_ALIGN = "align"
   private val CUSTOMIZER_NONFLOAT = "nonfloat"
 
@@ -65,7 +68,8 @@ class TableParser(parser: CreoleWikiParser) {
             cell(SPAN -> span)
           }
         case CUSTOMIZER_WIDTH => table(WIDTH(targetColumn) -> value)
-        case CUSTOMIZER_ALIGN => cell(ALIGN -> value)
+        case CUSTOMIZER_ALIGN => table(ALIGN(targetColumn) -> leftOrRight(value))
+        case CUSTOMIZER_ALIGN_CELL => cell(ALIGN -> leftOrRight(value))
       }).trim
   }
 
@@ -106,6 +110,7 @@ class TableParser(parser: CreoleWikiParser) {
   private def handleTableCustomizers(options: String): String = {
     CustomizerParser(options, (name, value) => name match {
       case CUSTOMIZER_NONFLOAT => table(FLOAT -> false)
+      case _ => //TODO warn
     }).trim
   }
 }

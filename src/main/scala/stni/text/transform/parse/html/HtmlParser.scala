@@ -12,7 +12,7 @@ import org.xml.sax.InputSource
 import java.io.StringReader
 import xml.parsing.{NoBindingFactoryAdapter, FactoryAdapter}
 import xml.factory.XMLLoader
-import stni.text.transform.parse.AbstractParser
+import stni.text.transform.parse.{CustomizerParser, AbstractParser}
 import stni.text.transform.TransformContext
 import org.apache.commons.lang3.text.translate.AggregateTranslator
 import org.apache.commons.lang3.text.translate.LookupTranslator
@@ -24,6 +24,11 @@ import xml.{NodeSeq, Elem, Node, Text}
  *
  */
 class HtmlParser(context: TransformContext) extends AbstractParser(context) {
+  private val CUSTOMIZER_COLSPAN = "colspan"
+  private val CUSTOMIZER_WIDTH = "width"
+  private val CUSTOMIZER_ALIGN = "align"
+  private val CUSTOMIZER_ALIGN_CELL = "align-cell"
+
   val LINK_PATTERN = Pattern.compile("(https?://[^\\Q (,.?!:;\"')\\E]*)")
   val UNESCAPE_HTML4 = new AggregateTranslator(
     lookupTranslator(EntityArrays.ISO8859_1_UNESCAPE().asInstanceOf[Array[Array[CharSequence]]]),
@@ -41,10 +46,39 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
   }
 
   override def parseImpl(): Segment = {
-    val unescaped = UNESCAPE_HTML4.translate(input);
+    val unescaped = UNESCAPE_HTML4.translate(input)
     val xml = EntityIgnoringXml.loadString( s"""<!DOCTYPE a PUBLIC "bla" "blu"><root $nsDefs>$unescaped</root>""")
-    parse(xml, 1)(0)
+    cleanNewlines(parse(xml, 1)(0))
   }
+
+  def trimNewlines(seg: Segment) = {
+    val ch = seg.children
+    while (!ch.isEmpty && ch(0).name == NEWLINE) ch.remove(0)
+    while (!ch.isEmpty && ch(ch.length - 1).name == NEWLINE) ch.remove(ch.length - 1)
+    seg
+  }
+
+  def cleanNewlines(seg: Segment): Segment = {
+    trimNewlines(seg)
+
+    val ch = seg.children
+    var i = 0
+    while (i < ch.length) {
+      cleanNewlines(ch(i))
+      if (List(HEADING, TABLE, IMAGE, LIST) contains ch(i).name) {
+        if (i > 0 && ch(i - 1).name == NEWLINE) {
+          ch.remove(i - 1)
+          i -= 2
+        } else if (i < ch.length - 1 && ch(i + 1).name == NEWLINE) {
+          ch.remove(i + 1)
+          i -= 1
+        }
+      }
+      i += 1
+    }
+    seg
+  }
+
 
   def nsDefs = namespaces.map(ns => s"""xmlns:$ns="$ns" """).mkString
 
@@ -59,7 +93,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
     node match {
       case <root>{ns@_*}</root> => List(ROOT(parse(ns, listLevel): _*))
       case <strong>{ns@_*}</strong> if (!ns.isEmpty) => List(BOLD(parse(ns, listLevel): _*))
-      case <p>{ns@_*}</p> if (!ns.isEmpty) => (NEWLINE() +: parse(ns, listLevel)) ++ List(NEWLINE())
+      case <p>{ns@_*}</p> if (!ns.isEmpty) => parse(ns, listLevel) ++ List(NEWLINE())
       case <span>{ns@_*}</span> if (!ns.isEmpty) => parse(ns, listLevel)
       case <div>{ns@_*}</div> if (!ns.isEmpty) => parse(ns, listLevel)
       case <br/> => List(NEWLINE())
@@ -97,20 +131,40 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
   }
 
   private def table(ns: NodeSeq, listLevel: Int): Segment = {
-    def cell(col: Node) = TABLE_CELL(parse(col.child, listLevel): _*).removeAll(_.name == NEWLINE)
-
     val table = TABLE()
-    var rowIndex = 1
-    var maxColumns = 0
-    for (row <- ns \ "tr") {
-      var colIndex = 1
-      for (col <- row \ "th") {
-        table(Attribute(rowIndex + "," + colIndex) -> cell(col)(HEADER -> true))
-        colIndex += 1
+    var colIndex = 0
+
+    def cell(col: Node, index: Int) = {
+      val cell = TABLE_CELL()
+      val content = parse(col.child, listLevel)
+      if (!content.isEmpty && content(0).name == PLAIN) {
+        content(0)(TEXT -> CustomizerParser(content(0)(TEXT).get.asInstanceOf[String], (name, value) => name match {
+          case CUSTOMIZER_WIDTH => table(WIDTH(index) -> value)
+          case CUSTOMIZER_ALIGN => table(ALIGN(index)-> leftOrRight(value))
+          case CUSTOMIZER_ALIGN_CELL => cell(ALIGN -> leftOrRight(value))
+          case _ =>
+        }).trim)
       }
-      for (col <- row \ "td") {
-        table(Attribute(rowIndex + "," + colIndex) -> cell(col))
-        colIndex += 1
+      try {
+        val span = Integer.parseInt((col \ "@colspan").text)
+        if (span > 1) cell(SPAN -> span)
+        colIndex += span - 1
+      } catch {
+        case e: NumberFormatException =>
+      }
+      if (col.label == "th" || (col \ "@class").text == "highlight") cell(HEADER -> true)
+      trimNewlines(cell(content: _*))
+    }
+
+    var rowIndex = 1
+    var maxColumns = 1
+    for (row <- ns \ "tr") {
+      colIndex = 1
+      for (col <- row.child) {
+        if (col.label == "td" || col.label == "th") {
+          table(Attribute(rowIndex + "," + colIndex) -> cell(col, colIndex))
+          colIndex += 1
+        }
       }
       maxColumns = Math.max(maxColumns, colIndex)
       rowIndex += 1

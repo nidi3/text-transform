@@ -16,8 +16,15 @@ object AttributeValue {
   val DOUBLE_ARROW_BOTH = new AttributeValue("dbarr")
   val LEFT = new AttributeValue("left")
   val RIGHT = new AttributeValue("right")
-  val FILE_REF = new AttributeValue("file")
-  val DOCUMENT_REF = new AttributeValue("document")
-  val IMAGE_REF = new AttributeValue("image")
+  val FILE_REF = new AttributeValue("file-ref")
+  val DOCUMENT_REF = new AttributeValue("document-ref")
+  val DOCUMENT_INCLUDE = new AttributeValue("document-include")
+  val IMAGE_REF = new AttributeValue("image-ref")
   val URL = new AttributeValue("url")
+
+  def leftOrRight(s: String) = s match {
+    case "left" => LEFT
+    case "right" => RIGHT
+    case _ => UNORDERED
+  }
 }

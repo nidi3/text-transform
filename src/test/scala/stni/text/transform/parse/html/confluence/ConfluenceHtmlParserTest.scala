@@ -31,22 +31,22 @@ class ConfluenceHtmlParserTest extends ParserTest {
 
   it should "parse page references without content-title" in {
     """<ac:link><ri:page /><ac:plain-text-link-body><![CDATA[link]]></ac:plain-text-link-body></ac:link>""" parseTo
-      LINK(TARGET -> ":", TYPE -> DOCUMENT_REF, plain("link"), SUB -> List(BOLD(plain(":"))))
+      LINK(TARGET -> ":", TYPE -> DOCUMENT_REF, plain("link"), SUB -> ROOT(BOLD(plain(":"))))
   }
 
   it should "parse page references without space-key" in {
     """<ac:link><ri:page ri:content-title="Home" /><ac:plain-text-link-body><![CDATA[link]]></ac:plain-text-link-body></ac:link>""" parseTo
-      LINK(TARGET -> ":Home", TYPE -> DOCUMENT_REF, plain("link"), SUB -> List(BOLD(plain(":Home"))))
+      LINK(TARGET -> ":Home", TYPE -> DOCUMENT_REF, plain("link"), SUB -> ROOT(BOLD(plain(":Home"))))
   }
 
   it should "parse page references with space-key" in {
     """<ac:link><ri:page ri:content-title="Home" ri:space-key="Space" /><ac:plain-text-link-body><![CDATA[link]]></ac:plain-text-link-body></ac:link>""" parseTo
-      LINK(TARGET -> "Space:Home", TYPE -> DOCUMENT_REF, plain("link"), SUB -> List(BOLD(plain("Space:Home"))))
+      LINK(TARGET -> "Space:Home", TYPE -> DOCUMENT_REF, plain("link"), SUB -> ROOT(BOLD(plain("Space:Home"))))
   }
 
   it should "adjust heading level in referenced page" in {
     """<ac:link><ri:page ri:content-title="&lt;h1>h&lt;/h1>" /><ac:plain-text-link-body><![CDATA[link]]></ac:plain-text-link-body></ac:link>""" parseTo
-      LINK(TARGET -> ":<h1>h</h1>", TYPE -> DOCUMENT_REF, plain("link"), SUB -> List(BOLD(plain(":"), HEADING(plain("h"), LEVEL -> 2))))
+      LINK(TARGET -> ":<h1>h</h1>", TYPE -> DOCUMENT_REF, plain("link"), SUB -> ROOT(BOLD(plain(":"), HEADING(plain("h"), LEVEL -> 2))))
   }
 
   behavior of "<ac:image>"
@@ -54,5 +54,12 @@ class ConfluenceHtmlParserTest extends ParserTest {
   it should "be parsed as image" in {
     """<ac:image><ri:attachment ri:filename="Bonsai.gif" /></ac:image>""" parseTo
       IMAGE(TARGET -> "Bonsai.gif")
+  }
+
+  behavior of "macro include"
+
+  it should "be parsed as DOCUMENT_INCLUDE" in {
+    """<ac:macro ac:name="include"><ac:default-parameter>space:page</ac:default-parameter></ac:macro>""" parseTo
+      LINK(TYPE -> DOCUMENT_INCLUDE, TARGET -> "space:page", BOLD(plain("space:page")))
   }
 }

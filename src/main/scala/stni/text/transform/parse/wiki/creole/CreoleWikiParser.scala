@@ -7,6 +7,7 @@ import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
 import stni.text.transform.TransformContext
 import stni.text.transform.parse.wiki.{ListParser, AbstractWikiParser}
+import stni.text.transform.parse.CustomizerParser
 
 /**
  *
@@ -130,6 +131,7 @@ class CreoleWikiParser(context:TransformContext) extends AbstractWikiParser(cont
           case CUSTOMIZER_HEIGHT => image(HEIGHT -> value)
           case CUSTOMIZER_ANGLE => image(ANGLE -> value)
           case CUSTOMIZER_NONFLOAT => image(FLOAT -> false)
+          case _ => //TODO warn
         }),
         image)
     })

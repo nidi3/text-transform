@@ -1,4 +1,4 @@
-package stni.text.transform.parse.wiki.creole
+package stni.text.transform.parse
 
 import java.util.regex.Pattern
 

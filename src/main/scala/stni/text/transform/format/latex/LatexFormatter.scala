@@ -13,7 +13,7 @@ class LatexFormatter(val context:TransformContext) extends Formatter {
 }
 
 private[latex] object LatexFormatter {
-  def env(name: String)(block: => String) = s"\\begin{$name}$block\\end{$name}"
+  def env(name: String,param:String="")(block: => String) = s"\\begin{$name}$param $block\\end{$name}"
 
   def staticFormatter(s: String)(context: TransformContext, segment: Segment) = s
 

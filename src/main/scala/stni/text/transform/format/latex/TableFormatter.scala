@@ -34,8 +34,8 @@ class TableFormatter(context: TransformContext, segment: Segment) {
   }
 
   private def float(cap: Option[Segment]) = {
-    env("table") {
-      "[hpt] \\centering\n" +
+    env("table", "[hpt]") {
+      "\\centering\n" +
         table + caption("caption", cap)
     }
   }
@@ -47,39 +47,44 @@ class TableFormatter(context: TransformContext, segment: Segment) {
   }
 
   private def table = {
-    env("longtable") {
-      s"{$columnsStyle}\n" + (1 to rows).map(row => doRow(row)).mkString
+    env("longtable", s"{$columnsStyle}") {
+      (1 to rows).map(row => doRow(row)).mkString
     }
   }
 
-  private def columnsStyle = {
+  private def columnWidth(index: Int) = {
     val noWidth = (1 to cols).forall(col => segment(WIDTH(col)).isEmpty)
-    if (noWidth) {
-      ("p{" + (.9 / cols) + " \\textwidth} ") * cols
-    } else {
-      (1 to cols).map(col => segment(WIDTH(col)) match {
-        case Some(width) => "p{" + width + "} "
-        case _ => "l "
-      }).mkString
-    }
+    if (noWidth) Some((.9 / cols) + " \\textwidth")
+    else segment(WIDTH(index))
+  }
+
+  private def columnsStyle = {
+    (1 to cols).map(col => columnWidth(col) match {
+      case Some(width) => "p{" + width + "} "
+      case _ => "l "
+    }).mkString
   }
 
   private def doRow(row: Int) = {
     var currentCol = 1
 
+    def alignStyle(align: Option[Any], fallback: Option[Any]): String = align match {
+      case Some(LEFT) => "\\raggedright "
+      case Some(RIGHT) => "\\raggedleft "
+      case _ => if (fallback.isEmpty) "" else alignStyle(fallback, None)
+    }
+
     def doCell(cell: Segment) = {
-      val content =
-        (cell(ALIGN) match {
-          case Some(LEFT) => "\\raggedright "
-          case Some(RIGHT) => "\\raggedleft "
-          case _ => ""
-        }) + LatexFormatter.formatChildren(context, cell)
+      val content = alignStyle(cell(ALIGN), segment(ALIGN(currentCol))) + LatexFormatter.formatChildren(context, cell)
 
       cell(SPAN) match {
         case Some(span: Int) =>
           currentCol += span - 1
           s"\\multicolumn{$span}{l}{$content}"
-        case _ => content
+        case _ => columnWidth(currentCol) match {
+          case Some(width) => s"\\parbox[t]{$width}{$content}"
+          case _ => content
+        }
       }
     }
 

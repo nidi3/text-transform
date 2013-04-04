@@ -19,10 +19,12 @@ class ConfluenceHtmlParser(context: TransformContext) extends HtmlParser(context
     node match {
       case <ac:link>{ns@_*}</ac:link> => link(ns)
       case <ac:image>{ns@_*}</ac:image> => image(ns)
+      case n@ <ac:macro>{ns@_*}</ac:macro> => makro(n)
       case _ => super.parse(node, listLevel)
     }
   }
 
+  //TODO define \label beim ersten FILE_REF
   private def link(ns: Seq[Node]) = {
     val link = LINK()
     for (n <- ns) n match {
@@ -56,6 +58,17 @@ class ConfluenceHtmlParser(context: TransformContext) extends HtmlParser(context
       case _ =>
     }
     List(image)
+  }
+
+  private def makro(n: Node) = {
+    attr(n, "ac:name") match {
+      case "include" =>
+        val target = (n \ "default-parameter").text
+        val link = LINK(TYPE -> DOCUMENT_INCLUDE, TARGET -> target)
+        context.loadResource(link, target).map(content => link(context.includeSub(link, parseSub(content, context.subContext)).children:_*))
+        List(link)
+      case _ => Nil
+    }
   }
 
   private def attr(n: Node, attr: String) = {

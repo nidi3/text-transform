@@ -19,9 +19,10 @@ object PlainFormatter {
     '{' -> "\\{",
     '}' -> "\\}",
     '[' -> "{[}",
-    ']' -> "{]}")
+    ']' -> "{]}",
+    160 -> '~') //non-break space (&nbsp; in HTML)
 
-  def format(context:TransformContext,segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
+  def format(context: TransformContext, segment: Segment) = escaped(segment(TEXT).get.asInstanceOf[String])
 
   private def escaped(s: String): String = {
     val res = new StringBuilder
