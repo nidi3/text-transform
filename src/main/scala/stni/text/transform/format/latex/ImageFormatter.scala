@@ -57,15 +57,15 @@ object ImageFormatter {
 
   private def transformFloatEnvironment(name: String, imageName: String, options: String) = {
     val fig = transformFigure(imageName, options)
-    env("figure","[hpt]") {
+    env("figure", "[hpt]") {
       s"\\centering\n$fig\\caption{$name} \\label{image:$name}\n"
     }
   }
 
   private def transformNonfloatEnvironment(name: String, imageName: String, options: String) = {
     val fig = transformFigure(imageName, options)
-    env("center") {
-      env("minipage","{\\linewidth}") {
+    env("minipage", "{\\linewidth}") {
+      env("center") {
         s"$fig\\captionof{figure}{$name} \\label{image:$name}\n"
       }
     }
