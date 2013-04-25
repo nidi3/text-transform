@@ -173,7 +173,7 @@ class CreoleWikiParser(context:TransformContext) extends AbstractWikiParser(cont
       text.append('=')
     } else {
       val level = getCount('=') + initLevel + context.headingLevel
-      val heading = readUntil("=" * level, "\n")
+      val heading = readUntil("=" * level, "\n").trim
       skipWhitspaces()
       if (heading.length > 0) {
         addToResult(HEADING(LEVEL -> level, plain(heading)))

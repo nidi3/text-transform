@@ -75,6 +75,10 @@ class CreoleWikiParserTest extends ParserTest {
     "=hey=" parseTo HEADING(LEVEL -> 1, plain("hey"))
   }
 
+  it should "trim whitespaces" in {
+    "=  hey  =" parseTo HEADING(LEVEL -> 1, plain("hey"))
+  }
+
   it should "ignore fewer = inside" in {
     "====he==y====" parseTo HEADING(LEVEL -> 4, plain("he==y"))
   }
@@ -200,12 +204,24 @@ class CreoleWikiParserTest extends ParserTest {
       plain("next"))
   }
 
+  it should "trim whitespaces" in {
+    "# \ta    \n\nnext" parseTo ROOT(
+      LIST(TYPE -> ORDERED, LEVEL -> 1, ITEM(plain("a"))),
+      plain("next"))
+  }
+
   behavior of "*"
 
   it should "be parsed as unordered list when at start of line" in {
     "hhh\n  *a\nb\n*c\n\nnext" parseTo ROOT(
       plain("hhh\n"),
       LIST(TYPE -> UNORDERED, LEVEL -> 1, ITEM(plain("a\nb")), ITEM(plain("c"))),
+      plain("next"))
+  }
+
+  it should "trim whitespaces" in {
+    "* \ta    \n\nnext" parseTo ROOT(
+      LIST(TYPE -> UNORDERED, LEVEL -> 1, ITEM(plain("a"))),
       plain("next"))
   }
 
@@ -274,10 +290,10 @@ class CreoleWikiParserTest extends ParserTest {
 
 
   it should "allow customizers for colspan, width, align" in {
-    "|<colspan=2>a|<width=5cm><align=right>b|<width=6pt><colspan=2>|" parseTo TABLE(
-      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH(3) -> "5cm", WIDTH(4) -> "6pt",
+    "|<colspan=2>a|<width=5cm><align-cell=right><align=left>b|<width=6pt><colspan=2>|" parseTo TABLE(
+      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH(3) -> "5cm", WIDTH(4) -> "6pt",ALIGN(3)->LEFT,
       Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a")),
-      Attribute("1,3") -> TABLE_CELL(ALIGN -> "right", plain("b")),
+      Attribute("1,3") -> TABLE_CELL(ALIGN -> RIGHT, plain("b")),
       Attribute("1,4") -> TABLE_CELL(SPAN -> 2))
   }
 

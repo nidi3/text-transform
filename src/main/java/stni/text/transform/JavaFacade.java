@@ -17,6 +17,7 @@ public class JavaFacade {
     public static Object getInherited(Segment segment, String name) {
         return getInherited(segment, newAttribute(name));
     }
+
     public static Object getInherited(Segment segment, Attribute name) {
         Option<Object> val = segment.inherited(name);
         return val instanceof Some ? val.get() : null;

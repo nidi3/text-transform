@@ -64,11 +64,13 @@ object ImageFormatter {
 
   private def transformNonfloatEnvironment(name: String, imageName: String, options: String) = {
     val fig = transformFigure(imageName, options)
-    env("minipage", "{\\linewidth}") {
-      env("center") {
-        s"$fig\\captionof{figure}{$name} \\label{image:$name}\n"
-      }
-    }
+    """~\\\\""" +
+      env("minipage", "{\\linewidth}") {
+        env("center") {
+          s"$fig\\captionof{figure}{$name} \\label{image:$name}\n"
+        }
+      } +
+      """\par\bigskip"""
   }
 
   private def transformFigure(imageName: String, options: String) = s"\\includegraphics[$options]{$imageName}\n"
