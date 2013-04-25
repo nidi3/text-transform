@@ -58,11 +58,11 @@ class CreoleWikiParserTest extends ParserTest {
   }
 
   it should "be parsed as link when prepended by http:" in {
-    "hey http://ho" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "http://ho", plain("http://ho")))
+    "hey http://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "http://ho.com", plain("http://ho.com")))
   }
 
   it should "be parsed as link when prepended by https:" in {
-    "hey https://ho" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "https://ho", plain("https://ho")))
+    "hey https://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "https://ho.com", plain("https://ho.com")))
   }
 
   it should "allow formats inside" in {
@@ -130,11 +130,11 @@ class CreoleWikiParserTest extends ParserTest {
   }
 
   it should "also be found in plaintext 'http://'" in {
-    "bla (http://hhhh) https://xxx http:/end" parseTo ROOT(
+    "bla (http://hhhh.com) https://xxx.com http:/end" parseTo ROOT(
       plain("bla ("),
-      LINK(TYPE -> URL, TARGET -> "http://hhhh", plain("http://hhhh")),
+      LINK(TYPE -> URL, TARGET -> "http://hhhh.com", plain("http://hhhh.com")),
       plain(") "),
-      LINK(TYPE -> URL, TARGET -> "https://xxx", plain("https://xxx")),
+      LINK(TYPE -> URL, TARGET -> "https://xxx.com", plain("https://xxx.com")),
       plain(" http:/end"))
   }
 

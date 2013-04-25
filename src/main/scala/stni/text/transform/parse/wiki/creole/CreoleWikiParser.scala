@@ -12,7 +12,7 @@ import stni.text.transform.parse.CustomizerParser
 /**
  *
  */
-class CreoleWikiParser(context:TransformContext) extends AbstractWikiParser(context) {
+class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(context) {
   private val HTTP = "http:"
   private val HTTPS = "https:"
   private val IMAGE_PREFIX = "image:"
@@ -91,13 +91,23 @@ class CreoleWikiParser(context:TransformContext) extends AbstractWikiParser(cont
     }
   }
 
+  private def splitLinkSuffix(link: String) = {
+    if (!"(,.?!:;\\\"')".contains(link(link.length - 1))) (link, "")
+    else {
+      var pos = link.length - 1
+      while ("(,.?!:;\\\"')".contains(link(pos))) pos -= 1
+      (link.substring(0, pos+1), link.substring(pos + 1))
+    }
+  }
+
   private def italics() {
     if (nextChar() == '/') {
       text.endsWith(HTTP, HTTPS) match {
         case Some(end) =>
           text.removeLast(end.length)
-          val link = end + "/" + readUntilChar("(,.?!:;\\\"') ")
-          addToResult(LINK(TYPE -> URL, TARGET -> link, plain(link)))
+          val link = splitLinkSuffix(end + "/" + readUntilChar(" "))
+          addToResult(LINK(TYPE -> URL, TARGET -> link._1, plain(link._1)))
+          pushBack(link._2.length)
         case None =>
           nextChar()
           val italics = readUntil("//")
