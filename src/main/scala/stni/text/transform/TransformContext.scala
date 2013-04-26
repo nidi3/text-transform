@@ -18,6 +18,8 @@ class TransformContext(val headingLevel: Int, locale: Locale, resourceLoader: Re
   def subContext = new TransformContext(headingLevel + 1, locale, resourceLoader)
 
   def includeSub(parent: Segment, sub: Segment) = sub
+
+  def processLink(source: Segment, text: String, url: String): Pair[String, String] = (text, url)
 }
 
 
