@@ -13,7 +13,8 @@ object LinkFormatter {
 
     def link = {
       val ch = LatexFormatter.formatChildren(context, segment)
-      s"\\href{$target}{$ch}"
+      val (text, url) = context.processLink(segment, ch, target)
+      s"\\href{$url}{$text}"
     }
 
     def image = {
