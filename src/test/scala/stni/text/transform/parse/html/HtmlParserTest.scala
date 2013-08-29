@@ -90,8 +90,12 @@ class HtmlParserTest extends ParserTest {
     "<h1>hey</h1>" parseTo HEADING(plain("hey"), LEVEL -> 1)
   }
 
-  it should "be be aware of level" in {
+  it should "be aware of level" in {
     "<h2>hey</h2>" parseTo HEADING(plain("hey"), LEVEL -> 2)
+  }
+
+  it should "be parsed even with style attribute" in {
+    "<h2 style=\"bla\">hey</h2>" parseTo HEADING(plain("hey"), LEVEL -> 2)
   }
 
   behavior of "<a>"

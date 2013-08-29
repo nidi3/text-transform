@@ -109,6 +109,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
       case <ul>{ns@_*}</ul> if (!ns.isEmpty) => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
       case <li>{ns@_*}</li> if (!ns.isEmpty) => List(ITEM(parse(ns, listLevel): _*))
       case <table>{ns@_*}</table> => List(table(ns, listLevel))
+      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text))
       case n@ <a>{ns@_*}</a> =>
         val href = (n \ "@href").text
         val desc = if (ns.isEmpty) List(plain(href)) else parse(ns, listLevel)
@@ -128,6 +129,10 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
         list
       case _ => Nil
     }
+  }
+
+  private def image(src: String) = {
+    IMAGE(TARGET->src)
   }
 
   private def table(ns: NodeSeq, listLevel: Int): Segment = {
