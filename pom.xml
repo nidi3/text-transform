@@ -145,22 +145,15 @@
 
     <distributionManagement>
         <repository>
-            <id>mimacom-repo-id-deploy-closed</id>
-            <name>mimacom releases closed</name>
-            <uniqueVersion>false</uniqueVersion>
-            <url>${mimacom-deploy-path-releases-closed}</url>
+            <id>internal.repo</id>
+            <name>Internal Repository</name>
+            <url>${internal.repo.path}/releases</url>
         </repository>
         <snapshotRepository>
-            <id>mimacom-repo-id-deploy-closed</id>
-            <name>mimacom snapshots closed</name>
-            <uniqueVersion>false</uniqueVersion>
-            <url>${mimacom-deploy-path-snapshots-closed}</url>
+            <id>internal.repo</id>
+            <name>Internal Repository</name>
+            <url>${internal.repo.path}/snapshots</url>
         </snapshotRepository>
-        <site>
-            <id>mimacom-repo-id-deploy-closed</id>
-            <name>mimacom sites closed</name>
-            <url>${mimacom-deploy-path-sites-closed}/text-transform/${project.version}</url>
-        </site>
     </distributionManagement>
 
 </project>
