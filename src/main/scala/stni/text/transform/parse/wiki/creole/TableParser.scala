@@ -5,7 +5,7 @@ import stni.text.transform.Name._
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
-import stni.text.transform.parse.CustomizerParser
+import stni.text.transform.parse.TagCustomizerParser
 
 
 /**
@@ -61,7 +61,7 @@ class TableParser(parser: CreoleWikiParser) {
 
   private def handleCellCustomizers() {
     cellContent =
-      CustomizerParser(cellContent, (name, value) => name match {
+      TagCustomizerParser(cellContent, (name, value) => name match {
         case CUSTOMIZER_COLSPAN =>
           val span = Integer.parseInt(value)
           if (span > 1) {
@@ -108,7 +108,7 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def handleTableCustomizers(options: String): String = {
-    CustomizerParser(options, (name, value) => name match {
+    TagCustomizerParser(options, (name, value) => name match {
       case CUSTOMIZER_NONFLOAT => table(FLOAT -> false)
       case _ => //TODO warn
     }).trim

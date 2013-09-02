@@ -54,15 +54,26 @@ class TableFormatter(context: TransformContext, segment: Segment) {
 
   private def columnWidth(index: Int) = {
     val noWidth = (1 to cols).forall(col => segment(WIDTH(col)).isEmpty)
-    if (noWidth) Some((.9 / cols) + " \\textwidth")
+    if (noWidth) Some(90.0 / cols + "%")
     else segment(WIDTH(index))
   }
 
   private def columnsStyle = {
     (1 to cols).map(col => columnWidth(col) match {
-      case Some(width) => "p{" + width + "} "
+      case Some(width: String) => "p{" + handlePercent(width) + "} "
       case _ => "l "
     }).mkString
+  }
+
+  private def handlePercent(value: String): String = {
+    def calcPercent = {
+      try {
+        java.lang.Double.parseDouble(value.substring(0, value.length() - 1))
+      } catch {
+        case _: NumberFormatException => 100.0
+      }
+    }
+    if (value.endsWith("%")) (calcPercent / 100.0) + " \\textwidth" else value
   }
 
   private def doRow(row: Int) = {
@@ -82,7 +93,7 @@ class TableFormatter(context: TransformContext, segment: Segment) {
           currentCol += span - 1
           s"\\multicolumn{$span}{l}{$content}"
         case _ => columnWidth(currentCol) match {
-          case Some(width) => s"\\parbox[t]{$width}{$content}"
+          case Some(width: String) => "\\parbox[t]{" + handlePercent(width) + "}{" + content + "}"
           case _ => content
         }
       }

@@ -27,9 +27,9 @@ object ImageFormatter {
     def handlePercent(value: String, percentBase: String): String = {
       def calcPercent = {
         try {
-          Integer.parseInt(value.substring(0, value.length() - 1))
+          java.lang.Double.parseDouble(value.substring(0, value.length() - 1))
         } catch {
-          case _: NumberFormatException => 100
+          case _: NumberFormatException => 100.0
         }
       }
       if (value.endsWith("%")) (calcPercent / 100.0) + percentBase else value

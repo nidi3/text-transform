@@ -6,10 +6,8 @@ import java.util.regex.Pattern
  * Parse customizing attributes of an element, like the span in "|&lt;span=2>cell|".
  */
 object CustomizerParser {
-  private val CUSTOMIZER = Pattern.compile("<([A-Za-z-]+)(=([^>]+))?>")
-
-  def apply(input: String, block: (String, String) => Unit) = {
-    val matcher = CUSTOMIZER.matcher(input)
+  def apply(pattern: Pattern, input: String, block: (String, String) => Unit) = {
+    val matcher = pattern.matcher(input)
     var rest = input
 
     def find(): Boolean = {

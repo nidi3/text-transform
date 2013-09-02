@@ -38,6 +38,12 @@ class HtmlParserTest extends ParserTest {
     "hey <div>fat</div> ho" parseTo ROOT(plain("hey "), plain("fat"), plain(" ho"))
   }
 
+  behavior of "<font>"
+
+  it should "be ignored" in {
+    "hey <font>fat</font> ho" parseTo ROOT(plain("hey "), plain("fat"), plain(" ho"))
+  }
+
   behavior of "<br>"
 
   it should "add a newline" in {
@@ -197,6 +203,13 @@ class HtmlParserTest extends ParserTest {
       Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")),
       Attribute("2,1") -> TABLE_CELL(plain("c1")),
       Attribute("2,2") -> TABLE_CELL(plain("c2")))
+  }
+
+  it should "interpret the widths in px if given for all columns" in {
+    "<table><tbody><tr><th style='width: 100px'>h1</th><th style='width: 300px'>h2</th></tr></tbody></table>" parseTo TABLE(
+      COLUMNS -> 2, ROWS -> 1, WIDTH(1) -> "25.0%", WIDTH(2) -> "75.0%",
+      Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
+      Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")))
   }
 
 

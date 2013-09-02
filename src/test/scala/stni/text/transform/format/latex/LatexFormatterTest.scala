@@ -155,7 +155,7 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "understand relative width attribute" in {
-    start + "width=0.55\\textwidth" + end formatOf image(WIDTH -> "55%")
+    start + "width=0.555\\textwidth" + end formatOf image(WIDTH -> "55.5%")
   }
 
   it should "understand angle attribute and support multiple attributes" in {
@@ -168,8 +168,8 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "make use of captionof if not floating" in {
-    val start = "\\begin{center} \\begin{minipage}{\\linewidth} \\includegraphics["
-    val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{minipage}\\end{center}"
+    val start = "~\\\\\\\\\\begin{minipage}{\\linewidth} \\begin{center} \\includegraphics["
+    val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{center}\\end{minipage}\\par\\bigskip"
     val image = IMAGE(TARGET -> "target", FLOAT -> false, plain("bild"))
     start + "width=1.0\\textwidth" + end formatOf image
   }
@@ -181,25 +181,31 @@ class LatexFormatterTest extends FormatterTest {
   val postfix = "\\end{longtable}\\end{table}"
 
   it should "translate into a tabular environment wrapped into a table environment if floating" in {
-    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "a1&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table
+  }
+
+  it should "understand width values in percent" in {
+    prefix + "{p{0.445 \\textwidth} p{0.555 \\textwidth} } " + "\\parbox[t]{0.445 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf
+      table(WIDTH(1) -> "44.5%", WIDTH(2) -> "55.5%")
   }
 
   it should "understand width attribute" in {
-    prefix + "{p{5cm} l } " + "a1&\\tabularnewline \n" + postfix formatOf table(WIDTH(1) -> "5cm")
+    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \n" + postfix formatOf
+      table(WIDTH(1) -> "5cm", WIDTH(2) -> null)
   }
 
   it should "underline the header" in {
-    prefix + "{p{5cm} l } " + "a1&\\tabularnewline \\hline \\endhead\n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \\hline \\endhead\n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("a1")))
   }
 
   it should "translate align left into raggedright" in {
-    prefix + "{p{5cm} l } " + "\\raggedright a1&\\tabularnewline \n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{\\raggedright a1}&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> LEFT, plain("a1")))
   }
 
   it should "translate align right into reggedleft" in {
-    prefix + "{p{5cm} l } " + "\\raggedleft a1&\\tabularnewline \n" + postfix formatOf
+    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{\\raggedleft a1}&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> RIGHT, plain("a1")))
   }
 
@@ -207,6 +213,7 @@ class LatexFormatterTest extends FormatterTest {
     prefix + "{p{5cm} l } " + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a1")))
   }
+
 
   it should "translate into a simple tabular environment if not floating" in {
     val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> false,
@@ -217,6 +224,6 @@ class LatexFormatterTest extends FormatterTest {
       "\\captionof{table}{new table \"`here\"'} \\label{table:new table \"`here\"'}" +
       "\\end{center}"
 
-    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "a1&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table
   }
 }

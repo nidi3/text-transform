@@ -7,7 +7,7 @@ import stni.text.transform.Segment._
 import stni.text.transform.Attribute._
 import stni.text.transform.TransformContext
 import stni.text.transform.parse.wiki.{ListParser, AbstractWikiParser}
-import stni.text.transform.parse.CustomizerParser
+import stni.text.transform.parse.TagCustomizerParser
 
 /**
  *
@@ -53,7 +53,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
       nextChar()
       val definition = DEFINITION()
       definition(TEXT ->
-        CustomizerParser(readLine(), (name, value) => name match {
+        TagCustomizerParser(readLine(), (name, value) => name match {
           case CUSTOMIZER_WIDTH => definition(WIDTH -> value)
         })
       )
@@ -136,7 +136,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
     readUntilClose('{', "}}").map(data => {
       val image = IMAGE(FLOAT -> true)
       splitTarget(
-        CustomizerParser(data, (name, value) => name match {
+        TagCustomizerParser(data, (name, value) => name match {
           case CUSTOMIZER_WIDTH => image(WIDTH -> value)
           case CUSTOMIZER_HEIGHT => image(HEIGHT -> value)
           case CUSTOMIZER_ANGLE => image(ANGLE -> value)
