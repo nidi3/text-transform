@@ -14,7 +14,7 @@ object ImageFormatter {
     context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)
       case Some(imageName) =>
-        val name = formatChildren(context, segment)
+        val name = segment(CAPTION).getOrElse("").asInstanceOf[String]
         val option = createOptionString(segment)
         segment(FLOAT) match {
           case Some(true) => transformFloatEnvironment(name, imageName, option)

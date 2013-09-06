@@ -284,7 +284,7 @@ class CreoleWikiParserTest extends ParserTest {
         Attribute("4,1") -> TABLE_CELL(BOLD(plain("d")), plain("e")),
         Attribute("4,2") -> TABLE_CELL(plain("f")),
         Attribute("4,3") -> TABLE_CELL(plain("g")),
-        CAPTION -> plain("This table show interesting \"data\"")),
+        CAPTION -> "This table show interesting \"data\""),
       plain("next"))
   }
 

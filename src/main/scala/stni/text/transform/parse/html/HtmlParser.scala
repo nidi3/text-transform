@@ -1,19 +1,18 @@
 package stni.text.transform.parse.html
 
-import stni.text.transform.{AttributeValue, Segment}
+import stni.text.transform.{Const, AttributeValue, Segment, TransformContext}
 import stni.text.transform.Name._
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 
 import collection.mutable.ListBuffer
-import java.util.regex.Pattern
+import java.util.regex.{Matcher, Pattern}
 import org.xml.sax.InputSource
 import java.io.StringReader
 import xml.parsing.{NoBindingFactoryAdapter, FactoryAdapter}
 import xml.factory.XMLLoader
 import stni.text.transform.parse.AbstractParser
-import stni.text.transform.TransformContext
 import org.apache.commons.lang3.text.translate.AggregateTranslator
 import org.apache.commons.lang3.text.translate.LookupTranslator
 import org.apache.commons.lang3.text.translate.EntityArrays
@@ -29,7 +28,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
   private val CUSTOMIZER_ALIGN = "align"
   private val CUSTOMIZER_ALIGN_CELL = "align-cell"
 
-  val LINK_PATTERN = Pattern.compile("(https?://[^\\Q (,.?!:;\"')\\E]*)")
+  val PATTERN = Pattern.compile("(https?://[^\\Q (,.?!:;\"')\\E]*)|(<->)|(<=>)|(->)|(<-)|(=>)|(<=)")
   val UNESCAPE_HTML4 = new AggregateTranslator(
     lookupTranslator(EntityArrays.ISO8859_1_UNESCAPE().asInstanceOf[Array[Array[CharSequence]]]),
     lookupTranslator(EntityArrays.HTML40_EXTENDED_UNESCAPE().asInstanceOf[Array[Array[CharSequence]]]),
@@ -110,7 +109,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
       case <ul>{ns@_*}</ul> if !ns.isEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
       case <li>{ns@_*}</li> if !ns.isEmpty => List(ITEM(parse(ns, listLevel): _*))
       case <table>{ns@_*}</table> => List(new TableParser(this).parse(ns, listLevel))
-      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text))
+      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@alt").text))
       case n@ <a>{ns@_*}</a> => List(link((n \ "@href").text,ns,listLevel))
       case Text(t) => text(t)
       case _ => Nil
@@ -122,22 +121,38 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
     LINK(desc: _*)(TARGET -> href, TYPE -> URL)
   }
 
-  private def image(src: String) = {
-    IMAGE(TARGET -> src)
+  private def image(src: String,alt:String) = {
+    val image=IMAGE(TARGET -> src)
+    CssParser(alt, (name, value) => name match {
+      case "width" => image(WIDTH -> value)
+      case "caption" => image(CAPTION -> value)
+      case _ =>
+    })
+    image
   }
 
   private def text(t: String) = {
     val list = new ListBuffer[Segment]
     val s = new StringBuffer
-    val m = LINK_PATTERN.matcher(t)
+    val m: Matcher = PATTERN.matcher(t)
     while (m.find) {
       m.appendReplacement(s, "")
-      list += plain(s.toString)
-      list += LINK(plain(m.group(1)), TARGET -> m.group(1), TYPE -> URL)
+      if (s.length() > 0) list += plain(s.toString)
+      val matchedGroup = m.group(0)
+      matchedGroup match {
+        case "->" => list += symbol("->", ARROW_RIGHT)
+        case "=>" => list += symbol("=>", DOUBLE_ARROW_RIGHT)
+        case "<-" => list += symbol("<-", ARROW_LEFT)
+        case "<=" => list += symbol("<=", DOUBLE_ARROW_LEFT)
+        case "<->" => list += symbol("<->", ARROW_BOTH)
+        case "<=>" => list += symbol("<=>", DOUBLE_ARROW_BOTH)
+        case _ => list += LINK(plain(matchedGroup), TARGET -> matchedGroup, TYPE -> URL)
+      }
+
       s.setLength(0)
     }
     m.appendTail(s)
-    list += plain(s.toString)
+    if (s.length() > 0) list += plain(s.toString)
     list
   }
 }
