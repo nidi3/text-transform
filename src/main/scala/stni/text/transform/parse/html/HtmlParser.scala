@@ -1,13 +1,13 @@
 package stni.text.transform.parse.html
 
-import stni.text.transform.{Const, AttributeValue, Segment, TransformContext}
+import stni.text.transform.{AttributeValue, Segment, TransformContext}
 import stni.text.transform.Name._
 import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 
 import collection.mutable.ListBuffer
-import java.util.regex.{Matcher, Pattern}
+import java.util.regex.Pattern
 import org.xml.sax.InputSource
 import java.io.StringReader
 import xml.parsing.{NoBindingFactoryAdapter, FactoryAdapter}
@@ -118,14 +118,14 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
 
   private def link(href: String, ns: NodeSeq, listLevel: Int) = {
     val desc = if (ns.isEmpty) List(plain(href)) else parse(ns, listLevel)
-    LINK(desc: _*)(TARGET -> href, TYPE -> URL)
+    LINK(CAPTION -> ROOT(desc: _*), TARGET -> href, TYPE -> URL)
   }
 
-  private def image(src: String,alt:String) = {
-    val image=IMAGE(TARGET -> src)
+  private def image(src: String, alt: String) = {
+    val image = IMAGE(TARGET -> src)
     CssParser(alt, (name, value) => name match {
       case "width" => image(WIDTH -> value)
-      case "caption" => image(CAPTION -> value)
+      case "caption" => image(CAPTION -> ROOT(plain(value)))
       case _ =>
     })
     image
@@ -134,10 +134,14 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
   private def text(t: String) = {
     val list = new ListBuffer[Segment]
     val s = new StringBuffer
-    val m: Matcher = PATTERN.matcher(t)
+    val m = PATTERN.matcher(t)
+    def addPlain() {
+      if (s.length() > 0) list += plain(s.toString)
+    }
+
     while (m.find) {
       m.appendReplacement(s, "")
-      if (s.length() > 0) list += plain(s.toString)
+      addPlain()
       val matchedGroup = m.group(0)
       matchedGroup match {
         case "->" => list += symbol("->", ARROW_RIGHT)
@@ -146,13 +150,13 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
         case "<=" => list += symbol("<=", DOUBLE_ARROW_LEFT)
         case "<->" => list += symbol("<->", ARROW_BOTH)
         case "<=>" => list += symbol("<=>", DOUBLE_ARROW_BOTH)
-        case _ => list += LINK(plain(matchedGroup), TARGET -> matchedGroup, TYPE -> URL)
+        case _ => list += LINK(CAPTION->ROOT(plain(matchedGroup)), TARGET -> matchedGroup, TYPE -> URL)
       }
 
       s.setLength(0)
     }
     m.appendTail(s)
-    if (s.length() > 0) list += plain(s.toString)
+    addPlain()
     list
   }
 }

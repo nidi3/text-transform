@@ -58,11 +58,11 @@ class CreoleWikiParserTest extends ParserTest {
   }
 
   it should "be parsed as link when prepended by http:" in {
-    "hey http://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "http://ho.com", plain("http://ho.com")))
+    "hey http://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "http://ho.com", CAPTION -> ROOT(plain("http://ho.com"))))
   }
 
   it should "be parsed as link when prepended by https:" in {
-    "hey https://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "https://ho.com", plain("https://ho.com")))
+    "hey https://ho.com" parseTo ROOT(plain("hey "), LINK(TYPE -> URL, TARGET -> "https://ho.com", CAPTION -> ROOT(plain("https://ho.com"))))
   }
 
   it should "allow formats inside" in {
@@ -110,51 +110,51 @@ class CreoleWikiParserTest extends ParserTest {
   behavior of "[[]]"
 
   it should "be parsed as link" in {
-    "[[link]]" parseTo LINK(TYPE -> URL, TARGET -> "link", plain("link"))
+    "[[link]]" parseTo LINK(TYPE -> URL, TARGET -> "link", CAPTION -> ROOT(plain("link")))
   }
 
   it should "accept description after |" in {
-    "[[link|desc]]" parseTo LINK(TYPE -> URL, TARGET -> "link", plain("desc"))
+    "[[link|desc]]" parseTo LINK(TYPE -> URL, TARGET -> "link", CAPTION -> ROOT(plain("desc")))
   }
 
   it should "accept formats inside description" in {
-    "[[link|desc**bold**]]" parseTo LINK(TYPE -> URL, TARGET -> "link", plain("desc"), BOLD(plain("bold")))
+    "[[link|desc**bold**]]" parseTo LINK(TYPE -> URL, TARGET -> "link", CAPTION -> ROOT(plain("desc"), BOLD(plain("bold"))))
   }
 
   it should "treat links starting with 'image:' specially" in {
-    "[[image:xxx]]" parseTo LINK(TYPE -> IMAGE_REF, TARGET -> "xxx", plain("xxx"))
+    "[[image:xxx]]" parseTo LINK(TYPE -> IMAGE_REF, TARGET -> "xxx", CAPTION -> ROOT(plain("xxx")))
   }
 
   it should "treat links starting with 'document:' specially" in {
-    "[[document:xxx]]" parseTo LINK(TYPE -> DOCUMENT_REF, TARGET -> "xxx", plain("xxx"))
+    "[[document:xxx]]" parseTo LINK(TYPE -> DOCUMENT_REF, TARGET -> "xxx", CAPTION -> ROOT(plain("xxx")))
   }
 
   it should "also be found in plaintext 'http://'" in {
     "bla (http://hhhh.com) https://xxx.com http:/end" parseTo ROOT(
       plain("bla ("),
-      LINK(TYPE -> URL, TARGET -> "http://hhhh.com", plain("http://hhhh.com")),
+      LINK(TYPE -> URL, TARGET -> "http://hhhh.com", CAPTION -> ROOT(plain("http://hhhh.com"))),
       plain(") "),
-      LINK(TYPE -> URL, TARGET -> "https://xxx.com", plain("https://xxx.com")),
+      LINK(TYPE -> URL, TARGET -> "https://xxx.com", CAPTION -> ROOT(plain("https://xxx.com"))),
       plain(" http:/end"))
   }
 
   behavior of "{{}}"
 
   it should "be parsed as image" in {
-    "{{link}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", plain("link"))
+    "{{link}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", CAPTION -> ROOT(plain("link")))
   }
 
   it should "accept description after |" in {
-    "{{link|desc}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", plain("desc"))
+    "{{link|desc}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", CAPTION -> ROOT(plain("desc")))
   }
 
   it should "accept 'angle' as customizer" in {
     "{{<angle=90>link|desc**bold**}}" parseTo IMAGE(
-      FLOAT -> true, TARGET -> "link", ANGLE -> "90", plain("desc"), BOLD(plain("bold")))
+      FLOAT -> true, TARGET -> "link", ANGLE -> "90", CAPTION -> ROOT(plain("desc"), BOLD(plain("bold"))))
   }
 
   it should "accept 'width' as customizer" in {
-    "{{<width=50%>link}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", WIDTH -> "50%", plain("link"))
+    "{{<width=50%>link}}" parseTo IMAGE(FLOAT -> true, TARGET -> "link", WIDTH -> "50%", CAPTION -> ROOT(plain("link")))
   }
 
   behavior of ";"
@@ -284,14 +284,14 @@ class CreoleWikiParserTest extends ParserTest {
         Attribute("4,1") -> TABLE_CELL(BOLD(plain("d")), plain("e")),
         Attribute("4,2") -> TABLE_CELL(plain("f")),
         Attribute("4,3") -> TABLE_CELL(plain("g")),
-        CAPTION -> "This table show interesting \"data\""),
+        CAPTION -> ROOT(plain("This table show interesting \"data\""))),
       plain("next"))
   }
 
 
   it should "allow customizers for colspan, width, align" in {
     "|<colspan=2>a|<width=5cm><align-cell=right><align=left>b|<width=6pt><colspan=2>|" parseTo TABLE(
-      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH(3) -> "5cm", WIDTH(4) -> "6pt",ALIGN(3)->LEFT,
+      COLUMNS -> 5, ROWS -> 1, FLOAT -> true, WIDTH(3) -> "5cm", WIDTH(4) -> "6pt", ALIGN(3) -> LEFT,
       Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a")),
       Attribute("1,3") -> TABLE_CELL(ALIGN -> RIGHT, plain("b")),
       Attribute("1,4") -> TABLE_CELL(SPAN -> 2))

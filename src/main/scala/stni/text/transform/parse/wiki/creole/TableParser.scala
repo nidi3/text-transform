@@ -102,7 +102,7 @@ class TableParser(parser: CreoleWikiParser) {
       val options = parser.readUntil("\n").substring(1)
       val caption = handleTableCustomizers(options)
       if (caption.length > 0) {
-        table(CAPTION -> caption)
+        table(CAPTION -> ROOT(plain(caption)))
       }
     }
   }

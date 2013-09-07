@@ -17,30 +17,26 @@ class TableFormatter(context: TransformContext, segment: Segment) {
   val cols = segment(COLUMNS).get.asInstanceOf[Int]
 
   def format: String = {
-    val caption = segment(CAPTION).asInstanceOf[Option[String]]
+    val caption = LatexFormatter.formatCaption(context, segment)
     segment(FLOAT) match {
       case Some(true) => float(caption)
       case _ => nonfloat(caption)
     }
   }
 
-  private def caption(cmd: String, caption: Option[String]) = {
-    caption match {
-      case Some(cap) =>
-        val desc = LatexFormatter.format(context, Segment.plain(cap))
-        s"\n\\$cmd{$desc} \\label{table:$desc}"
-      case None => ""
-    }
+  private def caption(cmd: String, caption: String) = {
+    if (caption == "") ""
+    else s"\n\\$cmd{$caption} \\label{table:$caption}"
   }
 
-  private def float(cap: Option[String]) = {
+  private def float(cap: String) = {
     env("table", "[hpt]") {
       "\\centering\n" +
         table + caption("caption", cap)
     }
   }
 
-  private def nonfloat(cap: Option[String]) = {
+  private def nonfloat(cap: String) = {
     env("center") {
       table + caption("captionof{table}", cap)
     }

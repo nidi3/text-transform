@@ -11,9 +11,6 @@ import stni.text.transform.Segment._
  *
  */
 abstract class AbstractWikiParser(context: TransformContext) extends AbstractCharReadingParser(context) {
-  val HTTP_SLASH = "http://"
-  val HTTPS_SLASH = "https://"
-
   val listState = new ListState
   protected val text = new TextAccumulator
 

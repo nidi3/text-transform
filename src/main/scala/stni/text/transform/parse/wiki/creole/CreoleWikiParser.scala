@@ -96,7 +96,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
     else {
       var pos = link.length - 1
       while ("(,.?!:;\\\"')".contains(link(pos))) pos -= 1
-      (link.substring(0, pos+1), link.substring(pos + 1))
+      (link.substring(0, pos + 1), link.substring(pos + 1))
     }
   }
 
@@ -106,7 +106,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
         case Some(end) =>
           text.removeLast(end.length)
           val link = splitLinkSuffix(end + "/" + readUntilChar(" "))
-          addToResult(LINK(TYPE -> URL, TARGET -> link._1, plain(link._1)))
+          addToResult(LINK(TYPE -> URL, TARGET -> link._1, CAPTION -> ROOT(plain(link._1))))
           pushBack(link._2.length)
         case None =>
           nextChar()
@@ -161,7 +161,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
     val pos = data.indexOf('|')
     val target = data.substring(0, if (pos < 0) data.length else pos)
     val desc = data.substring(pos + 1)
-    segment(parseSub(desc).children: _*)(TARGET -> target)
+    segment(CAPTION -> ROOT(parseSub(desc).children: _*))(TARGET -> target)
     addToResult(segment)
   }
 

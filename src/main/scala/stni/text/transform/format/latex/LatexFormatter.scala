@@ -1,19 +1,24 @@
 package stni.text.transform.format.latex
 
-import stni.text.transform.{TransformContext, ResourceLoader, Formatter, Segment}
-import java.util.Locale
+import stni.text.transform._
 import stni.text.transform.Attribute._
 import stni.text.transform.Name._
 import stni.text.transform.AttributeValue._
+import scala.Some
 
-class LatexFormatter(val context:TransformContext) extends Formatter {
+class LatexFormatter(val context: TransformContext) extends Formatter {
   def format(segment: Segment) = {
     LatexFormatter.formatChildren(context, segment)
   }
 }
 
 private[latex] object LatexFormatter {
-  def env(name: String,param:String="")(block: => String) = s"\\begin{$name}$param $block\\end{$name}"
+  def env(name: String, param: String = "")(block: => String) = s"\\begin{$name}$param $block\\end{$name}"
+
+  def formatCaption(context: TransformContext, segment: Segment) = segment(CAPTION) match {
+    case Some(cap: Segment) => formatChildren(context, cap)
+    case _ => ""
+  }
 
   def staticFormatter(s: String)(context: TransformContext, segment: Segment) = s
 

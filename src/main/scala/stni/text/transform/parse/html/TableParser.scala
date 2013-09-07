@@ -22,6 +22,9 @@ class TableParser(parser: HtmlParser) {
   var maxColumns = 1
 
   def parse(ns: NodeSeq, listLevel: Int): Segment = {
+    if (!(ns \\ "caption").isEmpty) {
+      table(CAPTION -> ROOT(parser.parse((ns \\ "caption")(0).child, listLevel): _*))
+    }
     for (row <- ns \ "tr") {
       parseRow(row, listLevel)
     }

@@ -3,7 +3,6 @@ package stni.text.transform.format.latex
 import stni.text.transform.{TransformContext, Segment}
 import stni.text.transform.Attribute._
 import stni.text.transform.format.latex.LatexFormatter.env
-import stni.text.transform.format.latex.LatexFormatter.formatChildren
 
 /**
  * Formats an image element.
@@ -14,7 +13,7 @@ object ImageFormatter {
     context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)
       case Some(imageName) =>
-        val name = segment(CAPTION).getOrElse("").asInstanceOf[String]
+        val name = LatexFormatter.formatCaption(context, segment)
         val option = createOptionString(segment)
         segment(FLOAT) match {
           case Some(true) => transformFloatEnvironment(name, imageName, option)

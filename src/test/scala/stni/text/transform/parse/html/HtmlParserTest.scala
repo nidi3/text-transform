@@ -5,7 +5,7 @@ import stni.text.transform.Attribute._
 import stni.text.transform.AttributeValue._
 import stni.text.transform.Segment._
 import stni.text.transform.parse.ParserTest
-import stni.text.transform.{AttributeValue, Attribute, TransformContext}
+import stni.text.transform.{Attribute, TransformContext}
 import java.util.Locale
 
 
@@ -107,23 +107,23 @@ class HtmlParserTest extends ParserTest {
   behavior of "<a>"
 
   it should "be parsed as link" in {
-    """<a href="link"></a>""" parseTo LINK(plain("link"), TARGET -> "link", TYPE -> URL)
+    """<a href="link"></a>""" parseTo LINK(CAPTION -> ROOT(plain("link")), TARGET -> "link", TYPE -> URL)
   }
 
   it should "accept description as child" in {
-    """<a href="link">desc</a>""" parseTo LINK(plain("desc"), TARGET -> "link", TYPE -> URL)
+    """<a href="link">desc</a>""" parseTo LINK(CAPTION -> ROOT(plain("desc")), TARGET -> "link", TYPE -> URL)
   }
 
   it should "accept formats inside description" in {
-    """<a href="link">desc<strong>bold</strong></a>""" parseTo LINK(plain("desc"), BOLD(plain("bold")), TARGET -> "link", TYPE -> URL)
+    """<a href="link">desc<strong>bold</strong></a>""" parseTo LINK(CAPTION -> ROOT(plain("desc"), BOLD(plain("bold"))), TARGET -> "link", TYPE -> URL)
   }
 
   it should "also be found in plain 'http://'" in {
     "bla (http://hhhh) https://xxx http:/end" parseTo ROOT(
       plain("bla ("),
-      LINK(plain("http://hhhh"), TARGET -> "http://hhhh", TYPE -> URL),
+      LINK(CAPTION -> ROOT(plain("http://hhhh")), TARGET -> "http://hhhh", TYPE -> URL),
       plain(") "),
-      LINK(plain("https://xxx"), TARGET -> "https://xxx", TYPE -> URL),
+      LINK(CAPTION -> ROOT(plain("https://xxx")), TARGET -> "https://xxx", TYPE -> URL),
       plain(" http:/end"))
   }
 
@@ -135,8 +135,11 @@ class HtmlParserTest extends ParserTest {
   }
 
   it should "interpret the content of the alt attribute" in {
-    "<img src='bla.png' alt='width: 15cm; caption: Super bild' />" parseTo IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> "Super bild")
-    "<img src='bla.png' alt='caption: Super bild; width: 15cm;' />" parseTo IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> "Super bild")
+    "<img src='bla.png' alt='width: 15cm; caption: Super bild' />" parseTo
+      IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
+
+    "<img src='bla.png' alt='caption: Super bild; width: 15cm;' />" parseTo
+      IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
   }
 
   behavior of "<ol>"
@@ -202,6 +205,13 @@ class HtmlParserTest extends ParserTest {
       COLUMNS -> 2, ROWS -> 1, WIDTH(1) -> "25.0%", WIDTH(2) -> "75.0%",
       Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
       Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")))
+  }
+
+  it should "understand a <caption> child element" in {
+    "<table><caption>Hi <strong>fat</strong></caption><tbody><tr><td></td></tr></tbody></table>" parseTo TABLE(
+      COLUMNS -> 1, ROWS -> 1,
+      Attribute("1,1") -> TABLE_CELL(),
+      CAPTION -> ROOT(plain("Hi "), BOLD(plain("fat"))))
   }
 
 

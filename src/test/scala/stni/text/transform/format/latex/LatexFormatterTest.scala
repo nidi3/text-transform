@@ -81,7 +81,7 @@ class LatexFormatterTest extends FormatterTest {
   it should "translate external link into href and support nested format" in {
     "a\\href{http://}{d1\\textbf{d2}}b" formatOf ROOT(
       plain("a"),
-      LINK(TARGET -> "http://", TYPE -> URL, plain("d1"), BOLD(plain("d2"))),
+      LINK(TARGET -> "http://", TYPE -> URL, CAPTION -> ROOT(plain("d1"), BOLD(plain("d2")))),
       plain("b"))
   }
 
@@ -144,7 +144,7 @@ class LatexFormatterTest extends FormatterTest {
 
   val start = "\\begin{figure}[hpt] \\centering\n\\includegraphics["
   val end = "]{load:target}\n\\caption{bild} \\label{image:bild}\n\\end{figure}"
-  val image = IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> "bild")
+  val image = IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")))
 
   it should "translate into figure environment if floating and have textwidth if no width is specified" in {
     start + "width=1.0\\textwidth" + end formatOf image
@@ -164,13 +164,13 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "show an error message it cannot be found" in {
-    "Bild nix nicht gefunden" formatOf IMAGE(TARGET -> "nix", CAPTION -> "bild")
+    "Bild nix nicht gefunden" formatOf IMAGE(TARGET -> "nix", plain("bild"))
   }
 
   it should "make use of captionof if not floating" in {
     val start = "~\\\\\\\\\\begin{minipage}{\\linewidth} \\begin{center} \\includegraphics["
     val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{center}\\end{minipage}\\par\\bigskip"
-    val image = IMAGE(TARGET -> "target", FLOAT -> false, CAPTION -> "bild")
+    val image = IMAGE(TARGET -> "target", FLOAT -> false, CAPTION->ROOT(plain("bild")))
     start + "width=1.0\\textwidth" + end formatOf image
   }
 
@@ -217,7 +217,7 @@ class LatexFormatterTest extends FormatterTest {
 
   it should "translate into a simple tabular environment if not floating" in {
     val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> false,
-      CAPTION -> "new table \"here\"",
+      CAPTION -> ROOT(plain("new table \"here\"")),
       Attribute("1,1") -> TABLE_CELL(plain("a1")))
     val prefix = "\\begin{center} \\begin{longtable}"
     val postfix = "\\end{longtable}\n" +
