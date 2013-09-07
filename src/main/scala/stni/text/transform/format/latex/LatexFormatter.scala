@@ -41,7 +41,7 @@ private[latex] object LatexFormatter {
       case Some(s) => s
       case _ => "5cm"
     }
-    val item = segment(TEXT).get.asInstanceOf[String]
+    val item = segment(TEXT).get
     val text = formatDefs(context, segment)
     s"\\begin{description}[leftmargin=$width,style=sameline]\\item[$item]$text\\end{description}"
   }
@@ -51,7 +51,7 @@ private[latex] object LatexFormatter {
       "chapter", "section", "subsection", "subsubsection", "paragraph", "subparagraph"
     )
 
-    val level = segment(LEVEL).getOrElse(0).asInstanceOf[Int]
+    val level = segment(LEVEL).getOrElse(0)
     val heading = headings(Math.min(headings.length, context.headingLevel + level) - 1)
     cmdFormatter(heading)(context, segment)
   }

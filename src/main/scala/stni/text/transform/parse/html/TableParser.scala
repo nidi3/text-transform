@@ -70,7 +70,7 @@ class TableParser(parser: HtmlParser) {
   }
 
   private def handleTagCustomizer(content: Segment, index: Int, cell: Segment) {
-    content(TEXT -> TagCustomizerParser(content(TEXT).get.asInstanceOf[String], (name, value) => name match {
+    content(TEXT -> TagCustomizerParser(content(TEXT).get, (name, value) => name match {
       case CUSTOMIZER_WIDTH => table(WIDTH(index) -> value)
       case CUSTOMIZER_ALIGN => table(ALIGN(index) -> leftOrRight(value))
       case CUSTOMIZER_ALIGN_CELL => cell(ALIGN -> leftOrRight(value))
@@ -86,9 +86,9 @@ class TableParser(parser: HtmlParser) {
   }
 
   private def calcWidths() {
-    def isPx(col: Int) = table(WIDTH(col)).getOrElse("").asInstanceOf[String].endsWith("px")
+    def isPx(col: Int) = table(WIDTH(col)).getOrElse("").endsWith("px")
     def valuePx(col: Int) = {
-      val s = table(WIDTH(col)).get.asInstanceOf[String]
+      val s = table(WIDTH(col)).get
       try {
         Integer.parseInt(s.substring(0, s.length - 2))
       } catch {

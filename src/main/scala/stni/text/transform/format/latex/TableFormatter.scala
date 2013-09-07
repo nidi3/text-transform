@@ -13,8 +13,8 @@ object TableFormatter {
 }
 
 class TableFormatter(context: TransformContext, segment: Segment) {
-  val rows = segment(ROWS).get.asInstanceOf[Int]
-  val cols = segment(COLUMNS).get.asInstanceOf[Int]
+  val rows = segment(ROWS).get
+  val cols = segment(COLUMNS).get
 
   def format: String = {
     val caption = LatexFormatter.formatCaption(context, segment)
@@ -98,7 +98,7 @@ class TableFormatter(context: TransformContext, segment: Segment) {
     val s = new StringBuilder
     var header = false
     while (currentCol <= cols) {
-      segment(Attribute(row + "," + currentCol)) match {
+      segment(Attribute[Segment](row + "," + currentCol)) match {
         case Some(cell: Segment) =>
           cell(HEADER) match {
             case Some(true) => header = true

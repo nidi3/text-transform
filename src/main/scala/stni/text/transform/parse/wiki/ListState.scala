@@ -13,7 +13,7 @@ class ListState {
 
   def isInList = currentList != null
 
-  def getLevel: Int = currentList(LEVEL).get.asInstanceOf[Int]
+  def getLevel: Int = currentList(LEVEL).get
 
   def matchesListType(listType: AttributeValue) = currentList(TYPE).get == listType
 

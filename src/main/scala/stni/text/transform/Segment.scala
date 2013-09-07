@@ -7,7 +7,7 @@ import collection.mutable
 
 trait PseudoSegment
 
-class AttributePair(name: Attribute, value: Any) extends Pair(name, value) with PseudoSegment
+class AttributePair[T](name: Attribute[T], value: T) extends Pair(name, value) with PseudoSegment
 
 /**
  * A Segment is an abstract representation of a text. It is produced by a `stni.text.transform.Parser`
@@ -15,11 +15,14 @@ class AttributePair(name: Attribute, value: Any) extends Pair(name, value) with 
  * A Segment is defined by its name, a map of attributes and a list of child segments.
  */
 class Segment(val name: Name) extends PseudoSegment {
-  val attributes = mutable.Map[Attribute, Any]()
+  val attributes = mutable.Map[Attribute[_], Any]()
   val children = ListBuffer[Segment]()
   private var _parent: Option[Segment] = None
 
-  def apply(name: Attribute): Option[Any] = attributes.get(name)
+  def apply[T](name: Attribute[T]): Option[T] = attributes.get(name) match {
+    case value: Some[T] => value
+    case _ => None
+  }
 
   def apply(values: PseudoSegment*) = add(values: _*)
 
@@ -35,7 +38,7 @@ class Segment(val name: Name) extends PseudoSegment {
       case seg: Segment =>
         seg._parent = Some(this)
         children += seg
-      case attr: AttributePair =>
+      case attr: AttributePair[_] =>
         attributes.put(attr._1, attr._2)
     })
     this
@@ -59,11 +62,11 @@ class Segment(val name: Name) extends PseudoSegment {
     this
   }
 
-  def addAttribute(name: Attribute, value: Any): Segment = add(new AttributePair(name, value))
+  def addAttribute[T](name: Attribute[T], value: T): Segment = add(new AttributePair[T](name, value))
 
   def addChild(child: Segment): Segment = add(child)
 
-  def inherited(name: Attribute): Option[Any] = {
+  def inherited[T](name: Attribute[T]): Option[T] = {
     this(name) match {
       case Some(value) => Some(value)
       case _ => if (parent.isEmpty) None else parent.get.inherited(name)
@@ -108,7 +111,7 @@ class Segment(val name: Name) extends PseudoSegment {
   }
 
   override def hashCode = {
-    (attributes.hashCode + children.hashCode * 31)
+    attributes.hashCode + children.hashCode * 31
   }
 
 }

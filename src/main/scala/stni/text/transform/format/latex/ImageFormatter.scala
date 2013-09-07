@@ -9,7 +9,7 @@ import stni.text.transform.format.latex.LatexFormatter.env
  */
 object ImageFormatter {
   def format(context: TransformContext, segment: Segment): String = {
-    val image = segment(TARGET).get.asInstanceOf[String]
+    val image = segment(TARGET).get
     context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)
       case Some(imageName) =>

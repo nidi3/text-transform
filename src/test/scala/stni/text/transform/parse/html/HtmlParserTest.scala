@@ -215,35 +215,7 @@ class HtmlParserTest extends ParserTest {
   }
 
 
-  //it should "accept headings, formats inside, a caption" in {
-  //    "|=h1|=h2|\n   |a|b| \n |c \n |**d**e|f|g \n!<nonfloat>This table show interesting \"data\"\nnext" parseTo  ROOT(
-  //      assert(2 === list.size)
-  //        assertSegmentEquals(TABLE, null, list, 0)
-  //    val table = list(0)
-  //    assert(3 === table(COLUMNS).get)
-  //    assert(4 === table(ROWS).get)
-  //    assert(!table(FLOAT).get.asInstanceOf[Boolean])
-  //    assert(12 === table.attributes.size)
-  //    val c11 = table(Attribute("1,1")).get.asInstanceOf[Segment]
-  //    assert(TABLE_CELL === c11.name)
-  //    assert(true === c11(HEADER).get)
-  //    assertSegmentEquals(PLAIN, "h1", c11.children, 0)
-  //    val c12 = table(Attribute("1,2")).get.asInstanceOf[Segment]
-  //    assert(TABLE_CELL === c12.name)
-  //    assert(true === c12(HEADER).get)
-  //    assertSegmentEquals(PLAIN, "h2", c12.children, 0)
-  //    assert(table(Attribute("2,3")).isEmpty)
-  //    assert(table(Attribute("3,2")).isEmpty)
-  //    val c31 = table(Attribute("4,1")).get.asInstanceOf[Segment]
-  //    assert(TABLE_CELL === c31.name)
-  //    assert(c31(HEADER).isEmpty || !c31(HEADER).get.asInstanceOf[Boolean])
-  //
-  //    assertSegmentEquals(BOLD, null, c31.children, 0)
-  //    assertSegmentEquals(PLAIN, "d", c31.children, 0, 0)
-  //    assertSegmentEquals(PLAIN, "e", c31.children, 1)
-  //    assertSegmentEquals(PLAIN, "This table show interesting \"data\"", table(CAPTION).get.asInstanceOf[Segment])
-  //    assertSegmentEquals(PLAIN, "next", list, 1)
-  //  }
+
   //
   //
   //  it should "allow customizers for colspan, width, align" in {
@@ -253,7 +225,7 @@ class HtmlParserTest extends ParserTest {
   //    val table = list(0)
   //    assert(5 === table(COLUMNS).get)
   //    assert(1 === table(ROWS).get)
-  //    assert(table(FLOAT).get.asInstanceOf[Boolean])
+  //    assert(table(FLOAT).get)
   //    assert(8 === table.attributes.size) //cols,rows,float, 3x cell,2x width
   //    assert(table(WIDTH.index(1)).isEmpty)
   //    assert("5cm" === table(WIDTH.index(3)).get)
@@ -265,38 +237,6 @@ class HtmlParserTest extends ParserTest {
   //    assert("right" === c13(ALIGN).get)
   //    val c14 = table(Attribute("1,4")).get.asInstanceOf[Segment]
   //    assert(2 === c14(SPAN).get)
-  //  }
-
-  //  behavior of "<,>,-,= combined to arrows"
-  //
-  //  it should "parse as arrows" in {
-  //    "a-->b==>c<--d<==e<-->f<==>ggg->x=>x<-x<=x<->x<=>x" parseTo  ROOT(
-  //      assert(13 === list.size)
-  //        assertSegmentEquals(PLAIN, "a", list, 0)
-  //        assertSegmentEquals(SYMBOL, null, list, 1)
-  //        assert ("-->" === list(1)(ORIGINAL).get)
-  //        assert (ARROW_RIGHT === list(1)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "b", list, 2)
-  //        assertSegmentEquals(SYMBOL, null, list, 3)
-  //        assert ("==>" === list(3)(ORIGINAL).get)
-  //        assert (DOUBLE_ARROW_RIGHT === list(3)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "c", list, 4)
-  //        assertSegmentEquals(SYMBOL, null, list, 5)
-  //        assert ("<--" === list(5)(ORIGINAL).get)
-  //        assert (ARROW_LEFT === list(5)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "d", list, 6)
-  //        assertSegmentEquals(SYMBOL, null, list, 7)
-  //        assert ("<==" === list(7)(ORIGINAL).get)
-  //        assert (DOUBLE_ARROW_LEFT === list(7)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "e", list, 8)
-  //        assertSegmentEquals(SYMBOL, null, list, 9)
-  //        assert ("<-->" === list(9)(ORIGINAL).get)
-  //        assert (ARROW_BOTH === list(9)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "f", list, 10)
-  //        assertSegmentEquals(SYMBOL, null, list, 11)
-  //        assert ("<==>" === list(11)(ORIGINAL).get)
-  //        assert (DOUBLE_ARROW_BOTH === list(11)(TYPE).get)
-  //        assertSegmentEquals(PLAIN, "ggg->x=>x<-x<=x<->x<=>x", list, 12)
   //  }
 
   behavior of "unclosed formats"

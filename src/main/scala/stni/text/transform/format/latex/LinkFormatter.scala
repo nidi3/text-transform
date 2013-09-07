@@ -9,7 +9,7 @@ import stni.text.transform.AttributeValue._
  */
 object LinkFormatter {
   def format(context: TransformContext, segment: Segment) = {
-    val target = segment(TARGET).get.asInstanceOf[String]
+    val target = segment(TARGET).get
 
     def link = {
       val ch = LatexFormatter.formatCaption(context, segment)
