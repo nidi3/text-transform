@@ -27,7 +27,7 @@ class TableFormatter(context: TransformContext, segment: Segment) {
   private def caption(cmd: String, caption: Option[String]) = {
     caption match {
       case Some(cap) =>
-        val desc = LatexFormatter.format(context, Segment.plain(desc))
+        val desc = LatexFormatter.format(context, Segment.plain(cap))
         s"\n\\$cmd{$desc} \\label{table:$desc}"
       case None => ""
     }
