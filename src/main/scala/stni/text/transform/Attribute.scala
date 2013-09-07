@@ -23,7 +23,6 @@ object Attribute {
   val HEIGHT = Attribute[String]("height")
   val ANGLE = Attribute[String]("angle")
   val ALIGN = Attribute[AttributeValue]("align")
-  val ALIGN_ALL = Attribute("align-all")
   val HEADER = Attribute[Boolean]("header")
   val CAPTION = Attribute[Segment]("caption")
   val SUB = Attribute[Segment]("sub")
