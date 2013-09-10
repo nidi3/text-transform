@@ -85,15 +85,8 @@ class LatexFormatterTest extends FormatterTest {
       plain("b"))
   }
 
-  it should "translate link to image into ref with 'Abbildung'" in {
-    "aAbbildung \\ref{image:img}b" formatOf ROOT(
-      plain("a"),
-      LINK(TARGET -> "img", TYPE -> IMAGE_REF, plain("d1"), BOLD(plain("d2"))),
-      plain("b"))
-  }
-
   it should "translate other links into plain ref" in {
-    "a\\ref{other}b" formatOf ROOT(
+    "a\\autoref{other}b" formatOf ROOT(
       plain("a"),
       LINK(TARGET -> "other", plain("d1"), BOLD(plain("d2"))),
       plain("b"))
@@ -111,6 +104,10 @@ class LatexFormatterTest extends FormatterTest {
       plain("start"),
       LINK(TYPE -> DOCUMENT_INCLUDE, TARGET -> "sub", plain("a"), BOLD(plain("b"))),
       plain("eee"))
+  }
+
+  it should "reference label if type is ref" in {
+    "\\autoref{pedro}" formatOf ROOT(LINK(TARGET->"pedro"),TYPE->REF,CAPTION->ROOT(plain("Bild of Pedro")))
   }
 
   behavior of "heading"
@@ -143,34 +140,38 @@ class LatexFormatterTest extends FormatterTest {
   behavior of "image"
 
   val start = "\\begin{figure}[hpt] \\centering\n\\includegraphics["
-  val end = "]{load:target}\n\\caption{bild} \\label{image:bild}\n\\end{figure}"
-  val image = IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")))
+  val end = "]{load:target}\n\\caption{bild} \n\\end{figure}"
 
   it should "translate into figure environment if floating and have textwidth if no width is specified" in {
-    start + "width=1.0\\textwidth" + end formatOf image
+    start + "width=1.0\\textwidth" + end formatOf IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")))
+  }
+
+  it should "use the id as label if available" in {
+    start + "width=1.0\\textwidth" + "]{load:target}\n\\caption{bild} \\label{pedro}\n\\end{figure}" formatOf
+      IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")), ID -> "pedro")
   }
 
   it should "understand absolute width attribute" in {
-    start + "width=5cm" + end formatOf image(WIDTH -> "5cm")
+    start + "width=5cm" + end formatOf IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")), WIDTH -> "5cm")
   }
 
   it should "understand relative width attribute" in {
-    start + "width=0.555\\textwidth" + end formatOf image(WIDTH -> "55.5%")
+    start + "width=0.555\\textwidth" + end formatOf IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")), WIDTH -> "55.5%")
   }
 
   it should "understand angle attribute and support multiple attributes" in {
     start + "height=0.1\\textheight,angle=45" + end formatOf
-      image(ANGLE -> "45", HEIGHT -> "10%", WIDTH -> null)
+      IMAGE(TARGET -> "target", FLOAT -> true, CAPTION -> ROOT(plain("bild")), ANGLE -> "45", HEIGHT -> "10%", WIDTH -> null)
   }
 
   it should "show an error message it cannot be found" in {
-    "Bild nix nicht gefunden" formatOf IMAGE(TARGET -> "nix", plain("bild"))
+    "Bild nix nicht gefunden" formatOf IMAGE(FLOAT -> true, CAPTION -> ROOT(plain("bild")), TARGET -> "nix", plain("bild"))
   }
 
   it should "make use of captionof if not floating" in {
     val start = "~\\\\\\\\\\begin{minipage}{\\linewidth} \\begin{center} \\includegraphics["
-    val end = "]{load:target}\n\\captionof{figure}{bild} \\label{image:bild}\n\\end{center}\\end{minipage}\\par\\bigskip"
-    val image = IMAGE(TARGET -> "target", FLOAT -> false, CAPTION->ROOT(plain("bild")))
+    val end = "]{load:target}\n\\captionof{figure}{bild} \n\\end{center}\\end{minipage}\\par\\bigskip"
+    val image = IMAGE(TARGET -> "target", FLOAT -> false, CAPTION -> ROOT(plain("bild")))
     start + "width=1.0\\textwidth" + end formatOf image
   }
 
@@ -216,12 +217,12 @@ class LatexFormatterTest extends FormatterTest {
 
 
   it should "translate into a simple tabular environment if not floating" in {
-    val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> false,
+    val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> false, ID->"pedro",
       CAPTION -> ROOT(plain("new table \"here\"")),
       Attribute("1,1") -> TABLE_CELL(plain("a1")))
     val prefix = "\\begin{center} \\begin{longtable}"
     val postfix = "\\end{longtable}\n" +
-      "\\captionof{table}{new table \"`here\"'} \\label{table:new table \"`here\"'}" +
+      "\\captionof{table}{new table \"`here\"'} \\label{pedro}" +
       "\\end{center}"
 
     prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table

@@ -17,11 +17,6 @@ object LinkFormatter {
       s"\\href{$url}{$text}"
     }
 
-    def image = {
-      val msg = context.message("image")
-      s"$msg \\ref{image:$target}"
-    }
-
     def document = {
       segment(SUB) match {
         case Some(seg: Segment) => LatexFormatter.formatChildren(context, seg)
@@ -31,11 +26,10 @@ object LinkFormatter {
 
     segment(TYPE) match {
       case Some(URL) => link
-      case Some(IMAGE_REF) => image
       case Some(DOCUMENT_REF) => document
       case Some(DOCUMENT_INCLUDE) => LatexFormatter.formatChildren(context, segment)
       case Some(FILE_REF) => LatexFormatter.formatChildren(context, segment) + s"\\label{$target}"
-      case _ => s"\\ref{$target}"
+      case _ => s"\\autoref{$target}"
     }
   }
 }

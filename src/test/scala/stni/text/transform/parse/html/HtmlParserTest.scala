@@ -118,6 +118,10 @@ class HtmlParserTest extends ParserTest {
     """<a href="link">desc<strong>bold</strong></a>""" parseTo LINK(CAPTION -> ROOT(plain("desc"), BOLD(plain("bold"))), TARGET -> "link", TYPE -> URL)
   }
 
+  it should "create a reference to a label if href starts with #" in {
+    "<a href='#pedro'>link</a>" parseTo LINK(TARGET -> "pedro", TYPE -> REF, CAPTION -> ROOT(plain("link")))
+  }
+
   it should "also be found in plain 'http://'" in {
     "bla (http://hhhh) https://xxx http:/end" parseTo ROOT(
       plain("bla ("),
@@ -140,6 +144,10 @@ class HtmlParserTest extends ParserTest {
 
     "<img src='bla.png' alt='caption: Super bild; width: 15cm;' />" parseTo
       IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
+  }
+
+  it should "take the id attribute as label" in {
+    "<img id='pedro'/>" parseTo IMAGE(TARGET -> "", ID -> "pedro")
   }
 
   behavior of "<ol>"

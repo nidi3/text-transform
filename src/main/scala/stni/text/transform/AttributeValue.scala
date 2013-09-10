@@ -20,6 +20,7 @@ object AttributeValue {
   val DOCUMENT_REF = new AttributeValue("document-ref")
   val DOCUMENT_INCLUDE = new AttributeValue("document-include")
   val IMAGE_REF = new AttributeValue("image-ref")
+  val REF = new AttributeValue("ref")
   val URL = new AttributeValue("url")
 
   def leftOrRight(s: String) = s match {

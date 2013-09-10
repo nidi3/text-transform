@@ -109,7 +109,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
       case <ul>{ns@_*}</ul> if !ns.isEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
       case <li>{ns@_*}</li> if !ns.isEmpty => List(ITEM(parse(ns, listLevel): _*))
       case <table>{ns@_*}</table> => List(new TableParser(this).parse(ns, listLevel))
-      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@alt").text))
+      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@alt").text,(n \ "@id").text))
       case n@ <a>{ns@_*}</a> => List(link((n \ "@href").text,ns,listLevel))
       case Text(t) => text(t)
       case _ => Nil
@@ -118,11 +118,14 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
 
   private def link(href: String, ns: NodeSeq, listLevel: Int) = {
     val desc = if (ns.isEmpty) List(plain(href)) else parse(ns, listLevel)
-    LINK(CAPTION -> ROOT(desc: _*), TARGET -> href, TYPE -> URL)
+    val link = LINK(CAPTION -> ROOT(desc: _*))
+    if (href.startsWith("#")) link(TARGET -> href.substring(1), TYPE -> REF)
+    else link(TARGET -> href, TYPE -> URL)
   }
 
-  private def image(src: String, alt: String) = {
+  private def image(src: String, alt: String, id: String) = {
     val image = IMAGE(TARGET -> src)
+    if (!id.isEmpty) image(ID->id)
     CssParser(alt, (name, value) => name match {
       case "width" => image(WIDTH -> value)
       case "caption" => image(CAPTION -> ROOT(plain(value)))

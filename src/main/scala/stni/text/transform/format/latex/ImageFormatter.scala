@@ -13,11 +13,11 @@ object ImageFormatter {
     context.loadResource(segment, image) match {
       case None => context.message("imageNotFound", image)
       case Some(imageName) =>
-        val name = LatexFormatter.formatCaption(context, segment)
+        val caption = LatexFormatter.formatCaption(context, segment)
         val option = createOptionString(segment)
         segment(FLOAT) match {
-          case Some(true) => transformFloatEnvironment(name, imageName, option)
-          case _ => transformNonfloatEnvironment(name, imageName, option)
+          case Some(true) => transformFloatEnvironment(caption, transformFigure(imageName, option), LatexFormatter.formatLabel(segment(ID)))
+          case _ => transformNonfloatEnvironment(caption, transformFigure(imageName, option), LatexFormatter.formatLabel(segment(ID)))
         }
     }
   }
@@ -54,24 +54,22 @@ object ImageFormatter {
     (height + width + angle).substring(1)
   }
 
-  private def transformFloatEnvironment(name: String, imageName: String, options: String) = {
-    val fig = transformFigure(imageName, options)
+  private def transformFloatEnvironment(caption: String, figure: String, formattedLabel: String) = {
     env("figure", "[hpt]") {
-      s"\\centering\n$fig\\caption{$name} \\label{image:$name}\n"
+      s"\\centering\n$figure\\caption{$caption} $formattedLabel\n"
     }
   }
 
-  private def transformNonfloatEnvironment(name: String, imageName: String, options: String) = {
-    val fig = transformFigure(imageName, options)
+  private def transformNonfloatEnvironment(caption: String, figure: String, formattedLabel: String) = {
     """~\\\\""" +
       env("minipage", "{\\linewidth}") {
         env("center") {
-          s"$fig\\captionof{figure}{$name} \\label{image:$name}\n"
+          s"$figure\\captionof{figure}{$caption} $formattedLabel\n"
         }
       } +
       """\par\bigskip"""
   }
 
-  private def transformFigure(imageName: String, options: String) = s"\\includegraphics[$options]{$imageName}\n"
+  private def transformFigure(source: String, options: String) = s"\\includegraphics[$options]{$source}\n"
 
 }

@@ -26,6 +26,7 @@ object Attribute {
   val HEADER = Attribute[Boolean]("header")
   val CAPTION = Attribute[Segment]("caption")
   val SUB = Attribute[Segment]("sub")
+  val ID = Attribute[String]("id")
 
   def apply[T](name: String) = new Attribute[T](name)
 }

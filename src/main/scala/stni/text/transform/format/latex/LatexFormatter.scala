@@ -15,6 +15,13 @@ class LatexFormatter(val context: TransformContext) extends Formatter {
 private[latex] object LatexFormatter {
   def env(name: String, param: String = "")(block: => String) = s"\\begin{$name}$param $block\\end{$name}"
 
+  def formatLabel(label: Option[String]): String = {
+    label match {
+      case Some(l) => s"\\label{$l}"
+      case None => ""
+    }
+  }
+
   def formatCaption(context: TransformContext, segment: Segment) = segment(CAPTION) match {
     case Some(cap: Segment) => formatChildren(context, cap)
     case _ => ""
