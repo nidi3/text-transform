@@ -21,14 +21,15 @@ class TableParser(parser: HtmlParser) {
   var colIndex = 1
   var maxColumns = 1
 
-  def parse(ns: NodeSeq, listLevel: Int): Segment = {
+  def parse(style: String, ns: NodeSeq, listLevel: Int): Segment = {
     if (!(ns \\ "caption").isEmpty) {
       table(CAPTION -> ROOT(parser.parse((ns \\ "caption")(0).child, listLevel): _*))
     }
     for (row <- ns \ "tr") {
       parseRow(row, listLevel)
     }
-    calcWidths()
+
+    setWidths(style)
     table(ROWS -> (rowIndex - 1), COLUMNS -> (maxColumns - 1))
     table
   }
@@ -85,7 +86,28 @@ class TableParser(parser: HtmlParser) {
     })
   }
 
-  private def calcWidths() {
+  private def setWidths(style: String) {
+    if (!setWidthsFromStyle(style)) setWidthsFromCells
+  }
+
+  private def setWidthsFromStyle(style: String): Boolean = {
+    var hasWidthStyle = false
+    def setWidths(value: String) {
+      hasWidthStyle = true
+      value.split(",").zipWithIndex.foreach({
+        case (width, index) => table(WIDTH(index + 1) -> width)
+      })
+    }
+
+    CssParser(style, (name, value) => name match {
+      case CUSTOMIZER_WIDTH => setWidths(value)
+      case _ =>
+    })
+
+    hasWidthStyle
+  }
+
+  private def setWidthsFromCells {
     def isPx(col: Int) = table(WIDTH(col)).getOrElse("").endsWith("px")
     def valuePx(col: Int) = {
       val s = table(WIDTH(col)).get

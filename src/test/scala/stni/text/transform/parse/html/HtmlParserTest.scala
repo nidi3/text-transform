@@ -139,10 +139,10 @@ class HtmlParserTest extends ParserTest {
   }
 
   it should "interpret the content of the alt attribute" in {
-    "<img src='bla.png' alt='width: 15cm; caption: Super bild' />" parseTo
+    "<img src='bla.png' class='width: 15cm; caption: Super bild' />" parseTo
       IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
 
-    "<img src='bla.png' alt='caption: Super bild; width: 15cm;' />" parseTo
+    "<img src='bla.png' class='caption: Super bild; width: 15cm;' />" parseTo
       IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
   }
 
@@ -211,6 +211,13 @@ class HtmlParserTest extends ParserTest {
   it should "interpret the widths in px if given for all columns" in {
     "<table><tbody><tr><th style='width: 100px'>h1</th><th style='width: 300px'>h2</th></tr></tbody></table>" parseTo TABLE(
       COLUMNS -> 2, ROWS -> 1, WIDTH(1) -> "25.0%", WIDTH(2) -> "75.0%",
+      Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
+      Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")))
+  }
+
+  it should "interpret the widths in the class attribute" in {
+    "<table class='width: 5cm,6cm'><tbody><tr><th style='width: 100px'>h1</th><th style='width: 300px'>h2</th></tr></tbody></table>" parseTo TABLE(
+      COLUMNS -> 2, ROWS -> 1, WIDTH(1) -> "5cm", WIDTH(2) -> "6cm",
       Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("h1")),
       Attribute("1,2") -> TABLE_CELL(HEADER -> true, plain("h2")))
   }
