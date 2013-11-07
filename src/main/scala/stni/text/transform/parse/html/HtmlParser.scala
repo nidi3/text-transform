@@ -13,27 +13,22 @@ import java.io.StringReader
 import xml.parsing.{NoBindingFactoryAdapter, FactoryAdapter}
 import xml.factory.XMLLoader
 import stni.text.transform.parse.AbstractParser
-import org.apache.commons.lang3.text.translate.AggregateTranslator
-import org.apache.commons.lang3.text.translate.LookupTranslator
-import org.apache.commons.lang3.text.translate.EntityArrays
-import org.apache.commons.lang3.text.translate.NumericEntityUnescaper
+import org.apache.commons.lang3.text.translate._
 import xml.{NodeSeq, Elem, Node, Text}
 
 /**
  *
  */
 class HtmlParser(context: TransformContext) extends AbstractParser(context) {
-  private val CUSTOMIZER_COLSPAN = "colspan"
-  private val CUSTOMIZER_WIDTH = "width"
-  private val CUSTOMIZER_ALIGN = "align"
-  private val CUSTOMIZER_ALIGN_CELL = "align-cell"
-
   val PATTERN = Pattern.compile("(https?://[^\\Q (,.?!:;\"')\\E]*)|(<->)|(<=>)|(->)|(<-)|(=>)|(<=)")
   val UNESCAPE_HTML4 = new AggregateTranslator(
-    lookupTranslator(EntityArrays.ISO8859_1_UNESCAPE().asInstanceOf[Array[Array[CharSequence]]]),
-    lookupTranslator(EntityArrays.HTML40_EXTENDED_UNESCAPE().asInstanceOf[Array[Array[CharSequence]]]),
+    translator(EntityArrays.ISO8859_1_UNESCAPE()),
+    translator(EntityArrays.HTML40_EXTENDED_UNESCAPE()),
     new NumericEntityUnescaper()
   )
+
+  def translator(a: Array[Array[String]]): CharSequenceTranslator =
+    lookupTranslator(a.asInstanceOf[Array[Array[CharSequence]]])
 
   def lookupTranslator(a: Array[Array[CharSequence]]) = new LookupTranslator(a: _*)
 
