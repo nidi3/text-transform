@@ -11,7 +11,7 @@ abstract class AbstractParser(val context: TransformContext) extends Parser {
 
   def parse(input: String): Segment = {
     _input = input
-    parseImpl
+    parseImpl()
   }
 
   def parseImpl(): Segment
