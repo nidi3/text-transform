@@ -4,7 +4,7 @@
 
     <groupId>guru.nidi</groupId>
     <artifactId>text-transform</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
     <description />
