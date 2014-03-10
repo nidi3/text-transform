@@ -122,8 +122,8 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
     val image = IMAGE(TARGET -> src)
     if (!id.isEmpty) image(ID->id)
     CssParser(alt, (name, value) => name match {
-      case "width" => image(WIDTH -> value)
-      case "caption" => image(CAPTION -> ROOT(plain(value)))
+      case "width" if value != null => image(WIDTH -> value)
+      case "caption" if value != null => image(CAPTION -> ROOT(plain(value)))
       case _ =>
     })
     image

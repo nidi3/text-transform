@@ -67,7 +67,7 @@ object ImageFormatter {
           s"$figure\\captionof{figure}{$caption} $formattedLabel\n"
         }
       } +
-      """\par\bigskip"""
+      """\par\bigskip"""+"\n"
   }
 
   private def transformFigure(source: String, options: String) = s"\\includegraphics[$options]{$source}\n"

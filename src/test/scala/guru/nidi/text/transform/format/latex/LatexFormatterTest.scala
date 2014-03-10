@@ -170,7 +170,7 @@ class LatexFormatterTest extends FormatterTest {
 
   it should "make use of captionof if not floating" in {
     val start = "~\\\\\\\\\\begin{minipage}{\\linewidth} \\begin{center} \\includegraphics["
-    val end = "]{load:target}\n\\captionof{figure}{bild} \n\\end{center}\\end{minipage}\\par\\bigskip"
+    val end = "]{load:target}\n\\captionof{figure}{bild} \n\\end{center}\\end{minipage}\\par\\bigskip\n"
     val image = IMAGE(TARGET -> "target", FLOAT -> false, CAPTION -> ROOT(plain("bild")))
     start + "width=1.0\\textwidth" + end formatOf image
   }
