@@ -179,39 +179,39 @@ class LatexFormatterTest extends FormatterTest {
 
   val table = TABLE(ROWS -> 1, COLUMNS -> 2, FLOAT -> true, Attribute("1,1") -> TABLE_CELL(plain("a1")))
   val prefix = "\\begin{table}[hpt] \\centering\n\\begin{longtable}"
-  val postfix = "\\end{longtable}\\end{table}"
+  val postfix = "\\bottomrule \\end{longtable}\\end{table}"
 
   it should "translate into a tabular environment wrapped into a table environment if floating" in {
-    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{@{} p{0.45 \\textwidth} p{0.45 \\textwidth} @{}} \\toprule " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table
   }
 
   it should "understand width values in percent" in {
-    prefix + "{p{0.445 \\textwidth} p{0.555 \\textwidth} } " + "\\parbox[t]{0.445 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf
+    prefix + "{@{} p{0.445 \\textwidth} p{0.555 \\textwidth} @{}} \\toprule " + "\\parbox[t]{0.445 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf
       table(WIDTH(1) -> "44.5%", WIDTH(2) -> "55.5%")
   }
 
   it should "understand width attribute" in {
-    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \n" + postfix formatOf
+    prefix + "{@{} p{5cm} l @{}} \\toprule " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \n" + postfix formatOf
       table(WIDTH(1) -> "5cm", WIDTH(2) -> null)
   }
 
   it should "underline the header" in {
-    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \\hline \\endhead\n" + postfix formatOf
+    prefix + "{@{} p{5cm} l @{}} \\toprule " + "\\parbox[t]{5cm}{a1}&\\tabularnewline \\midrule \\endhead\n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(HEADER -> true, plain("a1")))
   }
 
   it should "translate align left into raggedright" in {
-    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{\\raggedright a1}&\\tabularnewline \n" + postfix formatOf
+    prefix + "{@{} p{5cm} l @{}} \\toprule " + "\\parbox[t]{5cm}{\\raggedright a1}&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> LEFT, plain("a1")))
   }
 
   it should "translate align right into reggedleft" in {
-    prefix + "{p{5cm} l } " + "\\parbox[t]{5cm}{\\raggedleft a1}&\\tabularnewline \n" + postfix formatOf
+    prefix + "{@{} p{5cm} l @{}} \\toprule " + "\\parbox[t]{5cm}{\\raggedleft a1}&\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(ALIGN -> RIGHT, plain("a1")))
   }
 
   it should "translate span into multicolumn" in {
-    prefix + "{p{5cm} l } " + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
+    prefix + "{@{} p{5cm} l @{}} \\toprule " + "\\multicolumn{2}{l}{a1}\\tabularnewline \n" + postfix formatOf
       table(Attribute("1,1") -> TABLE_CELL(SPAN -> 2, plain("a1")))
   }
 
@@ -225,6 +225,6 @@ class LatexFormatterTest extends FormatterTest {
       "\\captionof{table}{new table \"`here\"'} \\label{pedro}" +
       "\\end{center}"
 
-    prefix + "{p{0.45 \\textwidth} p{0.45 \\textwidth} } " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n" + postfix formatOf table
+    prefix + "{@{} p{0.45 \\textwidth} p{0.45 \\textwidth} @{}} \\toprule " + "\\parbox[t]{0.45 \\textwidth}{a1}&\\tabularnewline \n\\bottomrule " + postfix formatOf table
   }
 }

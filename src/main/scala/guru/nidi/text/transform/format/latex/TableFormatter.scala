@@ -43,8 +43,8 @@ class TableFormatter(context: TransformContext, segment: Segment) {
   }
 
   private def table = {
-    env("longtable", s"{$columnsStyle}") {
-      (1 to rows).map(row => doRow(row)).mkString
+    env("longtable", s"{@{} $columnsStyle@{}} \\toprule") {
+      (1 to rows).map(row => doRow(row)).mkString + "\\bottomrule "
     }
   }
 
@@ -115,7 +115,7 @@ class TableFormatter(context: TransformContext, segment: Segment) {
 
   private def doEndOfRow(last: Boolean, header: Boolean) = {
     if (last) {
-      "\\tabularnewline " + (if (header) "\\hline \\endhead" else "") + "\n"
+      "\\tabularnewline " + (if (header) "\\midrule \\endhead" else "") + "\n"
     } else {
       "&"
     }
