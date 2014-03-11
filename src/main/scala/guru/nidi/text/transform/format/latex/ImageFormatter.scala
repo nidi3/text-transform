@@ -11,7 +11,7 @@ object ImageFormatter {
   def format(context: TransformContext, segment: Segment): String = {
     val image = segment(TARGET).get
     context.loadResource(segment, image) match {
-      case None => context.message("imageNotFound", image)
+      case None => context.message("imageNotFound", new LatexFormatter(context), image)
       case Some(imageName) =>
         val caption = LatexFormatter.formatCaption(context, segment)
         val option = createOptionString(segment)
@@ -67,7 +67,7 @@ object ImageFormatter {
           s"$figure\\captionof{figure}{$caption} $formattedLabel\n"
         }
       } +
-      """\par\bigskip"""+"\n"
+      """\par\bigskip""" + "\n"
   }
 
   private def transformFigure(source: String, options: String) = s"\\includegraphics[$options]{$source}\n"

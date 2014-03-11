@@ -15,7 +15,7 @@ import scala.Some
  */
 class LatexFormatterTest extends FormatterTest {
   val resourceLoader = new ResourceLoader {
-    def loadResource(source: Segment, name: String) = if (name == "nix") None else Some("load:" + name)
+    def loadResource(source: Segment, name: String) = if (name.startsWith("nix")) None else Some("load:" + name)
   }
 
   val formatter = new LatexFormatter(new TransformContext(2, Locale.GERMAN, resourceLoader))
@@ -165,7 +165,7 @@ class LatexFormatterTest extends FormatterTest {
   }
 
   it should "show an error message it cannot be found" in {
-    "Bild nix nicht gefunden" formatOf IMAGE(FLOAT -> true, CAPTION -> ROOT(plain("bild")), TARGET -> "nix", plain("bild"))
+    "Bild nix\\&nada nicht gefunden" formatOf IMAGE(FLOAT -> true, CAPTION -> ROOT(plain("bild")), TARGET -> "nix&nada", plain("bild"))
   }
 
   it should "make use of captionof if not floating" in {

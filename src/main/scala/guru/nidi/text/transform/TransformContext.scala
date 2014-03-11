@@ -4,6 +4,8 @@ package guru.nidi.text.transform
 import java.text.MessageFormat
 import java.util.Locale
 import java.util.ResourceBundle
+import Name.ROOT
+import Segment.plain
 
 /**
  *
@@ -11,7 +13,8 @@ import java.util.ResourceBundle
 class TransformContext(val headingLevel: Int, locale: Locale, resourceLoader: ResourceLoader) {
   val messages = ResourceBundle.getBundle(classOf[TransformContext].getPackage.getName + ".messages", locale)
 
-  def message(key: String, parameters: AnyRef*) = MessageFormat.format(messages.getString(key), parameters.toArray: _*)
+  def message(key: String, formatter: Formatter, parameters: AnyRef*) =
+    MessageFormat.format(messages.getString(key), parameters.map(v => formatter.format(ROOT(plain(v.toString)))).toArray: _*)
 
   def loadResource(source: Segment, name: String): Option[String] = resourceLoader.loadResource(source, name)
 
