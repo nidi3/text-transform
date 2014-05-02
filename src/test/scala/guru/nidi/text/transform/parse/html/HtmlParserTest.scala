@@ -74,10 +74,10 @@ class HtmlParserTest extends ParserTest {
     "hey <strong></strong>" parseTo plain("hey ")
   }
 
-  behavior of "entities"
+  behavior of "<b>"
 
-  ignore should "ingore unkonwn entities silently" in {
-    "xx&theta;yy" parseTo plain("xxyy")
+  it should "be parsed as bold" in {
+    "hey <b>fat</b> ho" parseTo ROOT(plain("hey "), BOLD(plain("fat")), plain(" ho"))
   }
 
   behavior of "<em>"
@@ -88,6 +88,24 @@ class HtmlParserTest extends ParserTest {
 
   it should "allow formats inside" in {
     "hey <em><strong>ho</strong></em>" parseTo ROOT(plain("hey "), ITALICS(BOLD(plain("ho"))))
+  }
+
+  behavior of "<i>"
+
+  it should "be parsed as italics" in {
+    "hey <i>ho</i>" parseTo ROOT(plain("hey "), ITALICS(plain("ho")))
+  }
+
+  behavior of "<u>"
+
+  it should "be parsed as underlined" in {
+    "hey <u>ho</u>" parseTo ROOT(plain("hey "), UNDERLINED(plain("ho")))
+  }
+
+  behavior of "entities"
+
+  ignore should "ingore unkonwn entities silently" in {
+    "xx&theta;yy" parseTo plain("xxyy")
   }
 
   behavior of "<hx>"

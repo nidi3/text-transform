@@ -28,6 +28,7 @@ class LatexFormatterTest extends FormatterTest {
     "\\\\" formatOf NEWLINE()
     "\\textbf{hallo}" formatOf BOLD(plain("hallo"))
     "\\textit{hallo}" formatOf ITALICS(plain("hallo"))
+    "\\underline{hallo}" formatOf UNDERLINED(plain("hallo"))
   }
 
   it should "support mixing with plain text" in {

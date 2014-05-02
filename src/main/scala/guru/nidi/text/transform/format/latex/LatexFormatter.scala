@@ -76,6 +76,7 @@ private[latex] object LatexFormatter {
     NEWLINE -> staticFormatter("\\\\") _,
     ITEM -> cmdFormatter("item") _,
     ITALICS -> cmdFormatter("textit") _,
+    UNDERLINED -> cmdFormatter("underline") _,
     BOLD -> cmdFormatter("textbf") _,
     PLAIN -> PlainFormatter.format _,
     DEFINITION -> definitionFormatter

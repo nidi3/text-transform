@@ -12,6 +12,7 @@ object Name {
   val PLAIN = new Name("plain")
   val BOLD = new Name("bold")
   val ITALICS = new Name("italics")
+  val UNDERLINED = new Name("underlined")
   val HEADING = new Name("heading")
   val LINK = new Name("link")
   val LIST = new Name("list")
