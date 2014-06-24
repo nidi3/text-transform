@@ -13,9 +13,12 @@ object LinkFormatter {
 
     def link = {
       val ch = LatexFormatter.formatCaption(context, segment)
-      val (text, url) = context.processLink(segment, ch, target)
+      val (text, rawUrl) = context.processLink(segment, ch, target)
+      val url = escape(rawUrl)
       s"\\href{$url}{$text}"
     }
+
+    def escape(url: String) = url.replace("%", "\\%")
 
     def document = {
       segment(SUB) match {

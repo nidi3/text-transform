@@ -86,6 +86,13 @@ class LatexFormatterTest extends FormatterTest {
       plain("b"))
   }
 
+  it should "escape links correctly (escape only %)" in {
+    "a\\href{http://a\\%20\\b#x{}}{d1}b" formatOf ROOT(
+      plain("a"),
+      LINK(TARGET -> "http://a%20\\b#x{}", TYPE -> URL, CAPTION -> ROOT(plain("d1"))),
+      plain("b"))
+  }
+
   it should "translate other links into plain ref" in {
     "a\\autoref{other}b" formatOf ROOT(
       plain("a"),
