@@ -68,6 +68,7 @@
                         <exclude>*</exclude>
                         <exclude>project/</exclude>
                         <exclude>src/main/resources/**/*</exclude>
+                        <exclude>src/test/resources/**/*</exclude>
                     </excludes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
