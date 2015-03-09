@@ -3,47 +3,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>guru.nidi</groupId>
+    <parent>
+        <groupId>guru.nidi</groupId>
+        <artifactId>guru-nidi-parent-pom</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <artifactId>text-transform</artifactId>
     <version>1.0.5-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
     <description/>
+    <url>https://github.com/nidi3/text-transform</url>
     <inceptionYear>2013</inceptionYear>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <properties>
-        <slf4j-version>1.6.6</slf4j-version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.compiler.version>1.6</project.build.compiler.version>
-    </properties>
 
     <build>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>2.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>${project.build.compiler.version}</source>
-                    <target>${project.build.compiler.version}</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
@@ -54,35 +29,6 @@
                         <goals>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-                    <excludes>
-                        <exclude>*</exclude>
-                        <exclude>project/</exclude>
-                        <exclude>src/main/resources/**/*</exclude>
-                        <exclude>src/test/resources/**/*</exclude>
-                    </excludes>
-                    <mapping>
-                        <java>SLASHSTAR_STYLE</java>
-                    </mapping>
-                    <strictCheck>true</strictCheck>
-                    <properties>
-                        <owner>Stefan Niederhauser</owner>
-                        <email>nidin@gmx.ch</email>
-                    </properties>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -112,41 +58,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.2.2</version>
-                <configuration>
-                    <checkModificationExcludeList>workspace.xml</checkModificationExcludeList>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.1</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.5.1</version>
-            </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav-jackrabbit</artifactId>
-                <version>2.2</version>
-            </extension>
-        </extensions>
     </build>
 
     <dependencies>
@@ -154,17 +66,6 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.10.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j-version}</version>
         </dependency>
 
         <dependency>
@@ -192,18 +93,4 @@
         <developerConnection>scm:git:https://github.com/nidi3/text-transform.git</developerConnection>
         <url>https://github.com/nidi3/text-transform</url>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>internal.repo</id>
-            <name>Internal Repository</name>
-            <url>${internal.repo.path}/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>internal.repo</id>
-            <name>Internal Repository</name>
-            <url>${internal.repo.path}/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
