@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>text-transform</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
     <description />
@@ -91,6 +91,6 @@
         <connection>scm:git:https://github.com/nidi3/text-transform.git</connection>
         <developerConnection>scm:git:https://github.com/nidi3/text-transform.git</developerConnection>
         <url>https://github.com/nidi3/text-transform</url>
-        <tag>text-transform-1.0.6</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
