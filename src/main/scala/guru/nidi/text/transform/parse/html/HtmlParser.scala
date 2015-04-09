@@ -123,7 +123,7 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
       case <ul>{ns@_*}</ul> if !ns.isEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
       case <li>{ns@_*}</li> if !ns.isEmpty => List(ITEM(parse(ns, listLevel): _*))
       case n@ <table>{ns@_*}</table> => List(new TableParser(this).parse((n\"@class").text, ns, listLevel))
-      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@class").text,(n \ "@id").text))
+      case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@alt").text,(n \ "@id").text))
       case n@ <a>{ns@_*}</a> => List(link((n \ "@href").text,ns,listLevel))
       case Text(t) => text(t)
       case _ => Nil
