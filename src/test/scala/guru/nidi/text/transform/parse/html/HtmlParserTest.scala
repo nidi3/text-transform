@@ -173,10 +173,10 @@ class HtmlParserTest extends ParserTest {
   }
 
   it should "interpret the content of the alt attribute" in {
-    "<img src='bla.png' class='width: 15cm; caption: Super bild' />" parseTo
+    "<img src='bla.png' alt='width: 15cm; caption: Super bild' />" parseTo
       IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
 
-    "<img src='bla.png' class='caption: Super bild; width: 15cm;' />" parseTo
+    "<img src='bla.png' alt='caption: Super bild; width: 15cm;' />" parseTo
       IMAGE(TARGET -> "bla.png", WIDTH -> "15cm", CAPTION -> ROOT(plain("Super bild")))
   }
 
