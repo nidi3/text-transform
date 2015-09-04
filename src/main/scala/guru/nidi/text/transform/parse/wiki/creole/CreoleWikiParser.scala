@@ -135,7 +135,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
   }
 
   private def link() {
-    readUntilClose('[', "]]").map(data => {
+    readUntilClose('[', "]]").foreach(data => {
       if (data.startsWith(IMAGE_PREFIX)) {
         splitTarget(data.substring(IMAGE_PREFIX.length), LINK(TYPE -> IMAGE_REF))
       } else if (data.startsWith(DOCUMENT_PREFIX)) {
@@ -147,7 +147,7 @@ class CreoleWikiParser(context: TransformContext) extends AbstractWikiParser(con
   }
 
   private def image() {
-    readUntilClose('{', "}}").map(data => {
+    readUntilClose('{', "}}").foreach(data => {
       val image = IMAGE(FLOAT -> true)
       splitTarget(
         TagCustomizerParser(data, (name, value) => name match {

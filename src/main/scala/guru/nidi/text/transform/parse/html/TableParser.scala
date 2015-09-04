@@ -38,7 +38,7 @@ class TableParser(parser: HtmlParser) {
   var maxColumns = 1
 
   def parse(style: String, ns: NodeSeq, listLevel: Int): Segment = {
-    if (!(ns \\ "caption").isEmpty) {
+    if ((ns \\ "caption").nonEmpty) {
       table(CAPTION -> ROOT(parser.parse((ns \\ "caption")(0).child, listLevel): _*))
     }
     for (row <- ns \ "tr") {
@@ -69,8 +69,8 @@ class TableParser(parser: HtmlParser) {
   private def cell(col: Node, index: Int, listLevel: Int) = {
     val cell = TABLE_CELL()
     val content = parser.parse(col.child, listLevel)
-    if (!content.isEmpty && content(0).name == PLAIN) handleTagCustomizer(content(0), index, cell)
-    if (!(col \ "@style").isEmpty) handleStyle((col \ "@style").text, index, cell)
+    if (content.nonEmpty && content.head.name == PLAIN) handleTagCustomizer(content.head, index, cell)
+    if ((col \ "@style").nonEmpty) handleStyle((col \ "@style").text, index, cell)
     handleColspan(col, cell)
     if (col.label == "th" || (col \ "@class").text == "highlight") cell(HEADER -> true)
     parser.trimNewlines(cell(content: _*))
@@ -103,7 +103,7 @@ class TableParser(parser: HtmlParser) {
   }
 
   private def setWidths(style: String) {
-    if (!setWidthsFromStyle(style)) setWidthsFromCells
+    if (!setWidthsFromStyle(style)) setWidthsFromCells()
   }
 
   private def setWidthsFromStyle(style: String): Boolean = {
@@ -123,7 +123,7 @@ class TableParser(parser: HtmlParser) {
     hasWidthStyle
   }
 
-  private def setWidthsFromCells {
+  private def setWidthsFromCells() {
     def isPx(col: Int) = table(WIDTH(col)).getOrElse("").endsWith("px")
     def valuePx(col: Int) = {
       val s = table(WIDTH(col)).get

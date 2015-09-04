@@ -39,7 +39,7 @@ class TextAccumulator() {
 
   def endsWith(ends: String*) = ends.find(end => text.endsWith(end))
 
-  def isEmptyOrNewline = text.length == 0 || text.charAt(text.length - 1) == '\n'
+  def isEmptyOrNewline = text.isEmpty || text.charAt(text.length - 1) == '\n'
 
   def removeLast(n: Int) {
     text.setLength(text.length - n)

@@ -32,11 +32,11 @@ trait ParserTest extends FlatSpec {
         assert(parsed === segment)
       } else {
         assert(parsed.children.size == 1)
-        assert(parsed.children(0) === segment)
+        assert(parsed.children.head === segment)
       }
     }
   }
 
-  implicit def string2parseSource(s: String) = new ParseSource(s)
+  implicit def string2parseSource(s: String): ParseSource = new ParseSource(s)
 
 }

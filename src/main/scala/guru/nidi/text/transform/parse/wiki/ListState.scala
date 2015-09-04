@@ -39,7 +39,7 @@ class ListState {
   def gotoParent() {
     currentList =
       currentList.parent match {
-        case Some(p) if (p.name == LIST) => p
+        case Some(p) if p.name == LIST => p
         case _ => null
       }
   }

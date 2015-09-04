@@ -96,7 +96,7 @@ class TableParser(parser: CreoleWikiParser) {
   }
 
   private def handleContent() {
-    if (cellContent.length() > 0 || !cell.attributes.isEmpty) {
+    if (cellContent.length() > 0 || cell.attributes.nonEmpty) {
       cell(parser.parseSub(cellContent).children: _*)
       table(Attribute(rows + "," + targetColumn) -> cell)
     }

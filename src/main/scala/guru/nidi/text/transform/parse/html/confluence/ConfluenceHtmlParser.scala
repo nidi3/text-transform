@@ -19,8 +19,8 @@ import guru.nidi.text.transform.Attribute._
 import guru.nidi.text.transform.AttributeValue._
 import guru.nidi.text.transform.Name._
 import guru.nidi.text.transform.Segment._
-import guru.nidi.text.transform.{Segment, TransformContext}
 import guru.nidi.text.transform.parse.html.HtmlParser
+import guru.nidi.text.transform.{Segment, TransformContext}
 
 import scala.xml.{Node, NodeSeq}
 
@@ -53,7 +53,7 @@ class ConfluenceHtmlParser(context: TransformContext) extends HtmlParser(context
         context.loadResource(link, target).map(content => link(SUB -> context.includeSub(link, parseSub(content, context.subContext))))
       case n@ <ac:plain-text-link-body>{ns@_*}</ac:plain-text-link-body> =>
         link.children.clear()
-        link(plain(ns(0).text))
+        link(plain(ns.head.text))
       //TODO anchor!
       //case n@ <ac:anchor>{ns@_*}</ac:anchor> => link(TARGET->"")
       case _ =>

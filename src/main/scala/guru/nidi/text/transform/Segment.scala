@@ -50,13 +50,13 @@ class Segment(val name: Name) extends PseudoSegment {
   }
 
   def add(values: PseudoSegment*): Segment = {
-    values.foreach(_ match {
+    values.foreach {
       case seg: Segment =>
         seg._parent = Some(this)
         children += seg
       case attr: AttributePair[_] =>
         attributes.put(attr._1, attr._2)
-    })
+    }
     this
   }
 

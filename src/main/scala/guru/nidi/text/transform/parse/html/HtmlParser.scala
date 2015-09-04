@@ -58,13 +58,13 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
   override def parseImpl(): Segment = {
     val unescaped = UNESCAPE_HTML4.translate(input)
     val xml = EntityIgnoringXml.loadString( s"""<!DOCTYPE a PUBLIC "bla" "blu"><root $nsDefs>$unescaped</root>""")
-    cleanNewlines(parse(xml, 1)(0))
+    cleanNewlines(parse(xml, 1).head)
   }
 
   def trimNewlines(seg: Segment) = {
     val ch = seg.children
-    while (!ch.isEmpty && ch(0).name == NEWLINE) ch.remove(0)
-    while (!ch.isEmpty && ch(ch.length - 1).name == NEWLINE) ch.remove(ch.length - 1)
+    while (ch.nonEmpty && ch.head.name == NEWLINE) ch.remove(0)
+    while (ch.nonEmpty && ch.last.name == NEWLINE) ch.remove(ch.length - 1)
     seg
   }
 
@@ -102,26 +102,26 @@ class HtmlParser(context: TransformContext) extends AbstractParser(context) {
 
     node match {
       case <root>{ns@_*}</root> => List(ROOT(parse(ns, listLevel): _*))
-      case <strong>{ns@_*}</strong> if !ns.isEmpty => List(BOLD(parse(ns, listLevel): _*))
-      case <b>{ns@_*}</b> if !ns.isEmpty => List(BOLD(parse(ns, listLevel): _*))
-      case <em>{ns@_*}</em> if !ns.isEmpty => List(ITALICS(parse(ns, listLevel): _*))
-      case <i>{ns@_*}</i> if !ns.isEmpty => List(ITALICS(parse(ns, listLevel): _*))
-      case <u>{ns@_*}</u> if !ns.isEmpty => List(UNDERLINED(parse(ns, listLevel): _*))
-      case <p>{ns@_*}</p> if !ns.isEmpty => parse(ns, listLevel) ++ List(NEWLINE())
-      case <span>{ns@_*}</span> if !ns.isEmpty => parse(ns, listLevel)
-      case <div>{ns@_*}</div> if !ns.isEmpty => parse(ns, listLevel)
-      case <font>{ns@_*}</font> if !ns.isEmpty => parse(ns, listLevel)
+      case <strong>{ns@_*}</strong> if ns.nonEmpty => List(BOLD(parse(ns, listLevel): _*))
+      case <b>{ns@_*}</b> if ns.nonEmpty => List(BOLD(parse(ns, listLevel): _*))
+      case <em>{ns@_*}</em> if ns.nonEmpty => List(ITALICS(parse(ns, listLevel): _*))
+      case <i>{ns@_*}</i> if ns.nonEmpty => List(ITALICS(parse(ns, listLevel): _*))
+      case <u>{ns@_*}</u> if ns.nonEmpty => List(UNDERLINED(parse(ns, listLevel): _*))
+      case <p>{ns@_*}</p> if ns.nonEmpty => parse(ns, listLevel) ++ List(NEWLINE())
+      case <span>{ns@_*}</span> if ns.nonEmpty => parse(ns, listLevel)
+      case <div>{ns@_*}</div> if ns.nonEmpty => parse(ns, listLevel)
+      case <font>{ns@_*}</font> if ns.nonEmpty => parse(ns, listLevel)
       case <br/> => List(NEWLINE())
       case <hr/> => List(LINE())
-      case <h1>{ns@_*}</h1> if !ns.isEmpty => List(heading(ns, 1))
-      case <h2>{ns@_*}</h2> if !ns.isEmpty => List(heading(ns, 2))
-      case <h3>{ns@_*}</h3> if !ns.isEmpty => List(heading(ns, 3))
-      case <h4>{ns@_*}</h4> if !ns.isEmpty => List(heading(ns, 4))
-      case <h5>{ns@_*}</h5> if !ns.isEmpty => List(heading(ns, 5))
-      case <h6>{ns@_*}</h6> if !ns.isEmpty => List(heading(ns, 6))
-      case <ol>{ns@_*}</ol> if !ns.isEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.ORDERED, LEVEL -> listLevel))
-      case <ul>{ns@_*}</ul> if !ns.isEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
-      case <li>{ns@_*}</li> if !ns.isEmpty => List(ITEM(parse(ns, listLevel): _*))
+      case <h1>{ns@_*}</h1> if ns.nonEmpty => List(heading(ns, 1))
+      case <h2>{ns@_*}</h2> if ns.nonEmpty => List(heading(ns, 2))
+      case <h3>{ns@_*}</h3> if ns.nonEmpty => List(heading(ns, 3))
+      case <h4>{ns@_*}</h4> if ns.nonEmpty => List(heading(ns, 4))
+      case <h5>{ns@_*}</h5> if ns.nonEmpty => List(heading(ns, 5))
+      case <h6>{ns@_*}</h6> if ns.nonEmpty => List(heading(ns, 6))
+      case <ol>{ns@_*}</ol> if ns.nonEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.ORDERED, LEVEL -> listLevel))
+      case <ul>{ns@_*}</ul> if ns.nonEmpty => List(LIST(parse(ns, listLevel + 1): _*)(TYPE -> AttributeValue.UNORDERED, LEVEL -> listLevel))
+      case <li>{ns@_*}</li> if ns.nonEmpty => List(ITEM(parse(ns, listLevel): _*))
       case n@ <table>{ns@_*}</table> => List(new TableParser(this).parse((n\"@class").text, ns, listLevel))
       case n@ <img>{ns@_*}</img> => List(image((n \ "@src").text,(n \ "@alt").text,(n \ "@id").text))
       case n@ <a>{ns@_*}</a> => List(link((n \ "@href").text,ns,listLevel))

@@ -35,6 +35,6 @@ trait FormatterTest extends FlatSpec {
     }
   }
 
-  implicit def string2formatSource(s: String) = new FormatSource(s)
+  implicit def string2formatSource(s: String): FormatSource = new FormatSource(s)
 
 }
